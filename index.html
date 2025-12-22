@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trivia Bot | Official Legal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <title>Trivia Bot | Cyber Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --cyan: #00ffff;
             --pink: #ff0096;
+            --purple: #bd00ff;
             --dark-bg: #0f141e;
-            --glass-bg: rgba(20, 25, 35, 0.7);
-            --glass-border: rgba(0, 255, 255, 0.1);
+            --glass-bg: rgba(20, 25, 35, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --card-hover: rgba(0, 255, 255, 0.05);
             --text-main: #ffffff;
             --text-muted: #a0a0b0;
+            --discord: #5865F2;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            scroll-behavior: smooth;
         }
 
         body {
@@ -28,175 +32,272 @@
             background-color: var(--dark-bg);
             color: var(--text-main);
             overflow-x: hidden;
-            /* Animated Gradient Background matching your Rank Card */
-            background: linear-gradient(135deg, #0f141e 0%, #28003c 100%);
+            background: linear-gradient(135deg, #05070a 0%, #1a0b2e 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* --- BACKGROUND ANIMATION --- */
+        /* --- BACKGROUND FX --- */
         .glow-orb {
             position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0,255,255,0.15) 0%, rgba(0,0,0,0) 70%);
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0,255,255,0.08) 0%, rgba(0,0,0,0) 70%);
             border-radius: 50%;
             top: -200px;
             left: -200px;
             z-index: -1;
-            animation: float 10s infinite ease-in-out;
+            animation: float 15s infinite ease-in-out;
+            pointer-events: none;
         }
 
         .glow-orb.secondary {
             top: auto;
-            bottom: -200px;
+            bottom: -300px;
             left: auto;
             right: -200px;
-            background: radial-gradient(circle, rgba(255,0,150,0.15) 0%, rgba(0,0,0,0) 70%);
-            animation: float 12s infinite ease-in-out reverse;
+            background: radial-gradient(circle, rgba(189, 0, 255, 0.08) 0%, rgba(0,0,0,0) 70%);
+            animation: float 18s infinite ease-in-out reverse;
         }
 
         @keyframes float {
             0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, 30px); }
+            50% { transform: translate(40px, 40px); }
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER & NAV --- */
         header {
             text-align: center;
             margin-top: 60px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding: 0 20px;
+            animation: fadeInDown 1s ease;
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
+            font-size: 3.5rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(90deg, var(--cyan), #fff, var(--pink));
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, var(--cyan), #fff, var(--purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
             margin-bottom: 10px;
         }
 
         .subtitle {
             color: var(--cyan);
             font-family: monospace;
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.8;
+            letter-spacing: 2px;
         }
 
-        /* --- NAVIGATION --- */
+        /* --- NAVIGATION TABS --- */
         .nav-container {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 50px;
             z-index: 10;
+            background: rgba(0,0,0,0.3);
+            padding: 5px;
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
         }
 
         .nav-btn {
-            text-decoration: none;
-            color: var(--cyan);
-            border: 1px solid var(--cyan);
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
             padding: 12px 30px;
-            border-radius: 50px;
+            border-radius: 40px;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            font-size: 0.85rem;
+            cursor: pointer;
             transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
         }
 
         .nav-btn:hover {
-            background: var(--cyan);
-            color: #000;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-        }
-
-        .nav-btn.secondary {
-            border-color: var(--pink);
-            color: var(--pink);
-        }
-
-        .nav-btn.secondary:hover {
-            background: var(--pink);
             color: #fff;
-            box-shadow: 0 0 20px rgba(255, 0, 150, 0.4);
         }
 
-        /* --- CONTENT CARDS (GLASSMORPHISM) --- */
-        .main-content {
+        .nav-btn.active {
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        /* --- DISCORD BUTTON --- */
+        .discord-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--discord);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+        }
+
+        .discord-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.5);
+            background-color: #4752c4;
+        }
+
+        .discord-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* --- TAB CONTENT HANDLING --- */
+        .tab-content {
+            display: none;
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             padding: 0 20px;
-            margin-bottom: 60px;
+            animation: slideUp 0.5s forwards;
         }
 
-        section {
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- FEATURE GRID --- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 35px;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 255, 255, 0.3);
+            background: linear-gradient(145deg, rgba(20,25,35,0.8), rgba(20,25,35,0.95));
+            box-shadow: 0 10px 40px rgba(0, 255, 255, 0.1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cyan), transparent);
+        }
+
+        .card.risk::before { background: linear-gradient(90deg, var(--pink), transparent); }
+        .card.raid::before { background: linear-gradient(90deg, var(--purple), transparent); }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* Placeholder image style if you use GitHub images */
+        .card-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+            display: none; /* Hidden by default, enable if you have images */
+        }
+
+        .card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .warning {
+            color: var(--pink);
+            font-weight: 600;
+        }
+
+        /* --- LEGAL SECTIONS --- */
+        .legal-section {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 50px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            opacity: 0;
-            transform: translateY(20px);
-            animation: slideUp 0.8s forwards;
         }
 
-        section:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        @keyframes slideUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
+        .legal-section h2 {
             font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 30px;
             color: #fff;
             border-left: 4px solid var(--cyan);
-            padding-left: 15px;
-            margin-bottom: 30px;
-            font-size: 2rem;
+            padding-left: 20px;
         }
 
-        #privacy h2 {
-            border-left-color: var(--pink);
-        }
-
-        h3 {
+        .legal-section h3 {
             color: var(--cyan);
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
         }
 
-        #privacy h3 {
-            color: var(--pink);
-        }
-
-        p {
-            color: var(--text-muted);
-            line-height: 1.8;
-            margin-bottom: 15px;
-            font-size: 1rem;
-        }
-
-        ul {
+        .legal-section ul {
             margin-left: 20px;
             color: var(--text-muted);
             margin-bottom: 20px;
+            line-height: 1.6;
         }
 
-        li {
-            margin-bottom: 10px;
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- FOOTER --- */
@@ -204,34 +305,19 @@
             margin-top: auto;
             padding: 40px;
             text-align: center;
-            color: #555;
-            font-size: 0.9rem;
+            color: #666;
+            font-size: 0.8rem;
             border-top: 1px solid rgba(255,255,255,0.05);
             width: 100%;
-            background: rgba(0,0,0,0.2);
         }
 
-        /* --- SCROLL BAR --- */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f141e;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 5px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--cyan);
-        }
-
-        /* Mobile Adjustments */
+        /* Mobile */
         @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .nav-container { width: 90%; justify-content: space-between; }
+            .nav-btn { padding: 10px 15px; font-size: 0.7rem; }
             section { padding: 30px; }
-            h1 { font-size: 2rem; }
-            .nav-container { flex-direction: column; gap: 10px; width: 100%; max-width: 300px; }
-            .nav-btn { text-align: center; }
         }
     </style>
 </head>
@@ -242,16 +328,74 @@
 
     <header>
         <h1>Trivia Bot</h1>
-        <div class="subtitle">SYSTEM_ONLINE // V3.0</div>
+        <div class="subtitle">SYSTEM_ONLINE // V3.1</div>
     </header>
 
+    <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="discord-btn">
+        <svg class="discord-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z"/>
+        </svg>
+        Join Support Server
+    </a>
+
     <div class="nav-container">
-        <a href="#tos" class="nav-btn">Terms of Service</a>
-        <a href="#privacy" class="nav-btn secondary">Privacy Policy</a>
+        <button class="nav-btn active" onclick="switchTab('features', this)">Features</button>
+        <button class="nav-btn" onclick="switchTab('legal', this)">Legal & ToS</button>
     </div>
 
-    <div class="main-content">
-        <section id="tos">
+    <div id="features" class="tab-content active">
+        <div class="feature-grid">
+            
+            <div class="card">
+                <span class="card-icon">🧠</span>
+                <h3>The Protocol</h3>
+                <p>Every 20 minutes, a trivia question drops. Compete against the server to answer correctly.
+                <br><br>
+                <span class="highlight">Reward:</span> Credits & Streak Multipliers.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-icon">💎</span>
+                <h3>Cyber Economy</h3>
+                <p>Accumulate credits to dominate the leaderboard. Use the <span class="highlight">/shop</span> to buy powerups, or list your rare items in the <span class="highlight">/auction</span> house for massive profits.</p>
+            </div>
+
+            <div class="card risk">
+                <span class="card-icon">⚔️</span>
+                <h3>Duel System</h3>
+                <p>Challenge other users to 1v1 trivia battles.
+                <br><br>
+                <strong>Modes:</strong>
+                <br>• Normal: Friendly practice.
+                <br>• <span class="warning">RISKY MODE:</span> High stakes. If the winner answers 5/5 correctly, they steal <span class="warning">30%</span> of the loser's total credits.</p>
+            </div>
+
+            <div class="card raid">
+                <span class="card-icon">👹</span>
+                <h3>Boss Raids</h3>
+                <p>Randomly spawned Boss Events require the whole server to cooperate. Deal damage by answering correctly.
+                <br><br>
+                <span class="highlight">Loot:</span> Key Fragments & Rare Collectables.</p>
+            </div>
+
+            <div class="card">
+                <span class="card-icon">💳</span>
+                <h3>Rank Cards</h3>
+                <p>Generate beautiful, dynamic Rank Cards and Profiles using <span class="highlight">/rank</span>. Customize your card's color theme by purchasing roles in the shop.</p>
+            </div>
+
+             <div class="card">
+                <span class="card-icon">🤖</span>
+                <h3>AI Generation</h3>
+                <p>Questions are generated dynamically by AI, ensuring endless variety across categories like Coding, Anime, History, and Science.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="legal" class="tab-content">
+        
+        <div class="legal-section">
             <h2>Terms of Service</h2>
             <p><strong>Last Updated:</strong> December 2025</p>
 
@@ -259,54 +403,66 @@
             <p>By inviting or using Trivia Bot ("the Service") in your Discord server, you agree to these Terms. If you do not agree, please remove the bot from your server.</p>
 
             <h3>2. Usage License</h3>
-            <p>We grant you a limited, revocable, non-exclusive license to use Trivia Bot for personal entertainment on Discord.</p>
             <ul>
                 <li>You may not attempt to reverse engineer or modify the bot's source code.</li>
-                <li>You may not use the bot to violate Discord's Terms of Service or Community Guidelines.</li>
-                <li>Automated abuse or spamming of commands is strictly prohibited.</li>
+                <li>You may not use the bot to violate Discord's Terms of Service.</li>
+                <li>Automated abuse (self-bots/macros) to farm credits is strictly prohibited.</li>
             </ul>
 
-            <h3>3. AI Content Disclaimer</h3>
-            <p>Trivia Bot uses advanced AI models (Xiaomi/OpenRouter) to generate content. While we aim for high quality, we cannot guarantee that every generated question is 100% factually accurate. Users accept the content "as is."</p>
+            <h3>3. The "Risky Duel" Mechanic</h3>
+            <p>Users acknowledge that the "Risky Duel" mode involves virtual currency loss. By accepting a Risky Duel, you explicitly agree that if you lose and the opponent achieves a perfect score, 30% of your current wallet balance will be transferred to them.</p>
 
             <h3>4. Service Availability</h3>
-            <p>The Service is provided on an "as available" basis. We reserve the right to modify, suspend, or discontinue the Service at any time without prior notice.</p>
-        </section>
+            <p>The Service is provided "as is". We reserve the right to wipe the economy (reset credits) for balancing purposes or updates.</p>
+        </div>
 
-        <section id="privacy">
-            <h2>Privacy Policy</h2>
+        <div class="legal-section">
+            <h2 style="border-left-color: var(--pink);">Privacy Policy</h2>
             <p><strong>Effective Date:</strong> December 2025</p>
 
             <h3>1. Data We Collect</h3>
-            <p>We prioritize your privacy. The bot collects only the minimal data necessary for functionality:</p>
+            <p>We prioritize your privacy. The bot collects only the minimal data necessary:</p>
             <ul>
-                <li><strong>User ID:</strong> To track your scores, streaks, and global rank.</li>
-                <li><strong>Display Name & Avatar:</strong> Temporarily accessed to generate Rank Cards (not stored permanently).</li>
-                <li><strong>Server Configuration:</strong> To remember which channel you selected for trivia.</li>
+                <li><strong>User ID:</strong> To track scores, inventory, and rank.</li>
+                <li><strong>Display Name/Avatar:</strong> Accessed temporarily to generate images.</li>
+                <li><strong>Message Content:</strong> Only processed when a command is invoked.</li>
             </ul>
 
             <h3>2. How We Use Data</h3>
-            <p>Your data is used strictly to:</p>
-            <ul>
-                <li>Maintain the Global Leaderboard.</li>
-                <li>Calculate your accuracy and current winning streak.</li>
-                <li>Prevent users from answering the same question twice.</li>
-            </ul>
+            <p>Your data is used strictly to maintain the Global Leaderboard, calculate economy stats, and facilitate gameplay mechanics.</p>
 
-            <h3>3. Data Storage & Security</h3>
-            <p>Data is stored in a secured JSON database restricted to the developer. We do not sell or share your personal data with third-party advertisers.</p>
+            <h3>3. Data Storage</h3>
+            <p>Data is stored in a secured JSON database. We do not sell or share your personal data with third parties.</p>
 
-            <h3>4. Third-Party Processing</h3>
-            <p>Trivia questions are generated via <strong>OpenRouter APIs</strong>. When a question is requested, no personal user data is sent to the AI provider—only the prompt for the trivia topic is transmitted.</p>
-
-            <h3>5. Data Deletion</h3>
-            <p>If you wish to have your data removed from the leaderboard, please contact the developer via Discord or the support server.</p>
-        </section>
+            <h3>4. Right to Erasure</h3>
+            <p>To request data deletion, join our Support Server and open a ticket.</p>
+        </div>
     </div>
 
     <footer>
-        <p>&copy; 2025 Trivia Bot. Powered by Xiaomi AI via OpenRouter.</p>
+        <p>&copy; 2025 Trivia Bot. Powered by Xiaomi AI via OpenRouter.<br>
+        Not affiliated with Discord Inc.</p>
     </footer>
+
+    <script>
+        function switchTab(tabId, btnElement) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked button
+            btnElement.classList.add('active');
+        }
+    </script>
 
 </body>
 </html>
