@@ -4,320 +4,214 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trivia Bot | Official Documentation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --cyan: #00ffff;
-            --pink: #ff0096;
-            --purple: #bd00ff;
-            --dark-bg: #0f141e;
-            --glass-bg: rgba(20, 25, 35, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --gradient-1: linear-gradient(135deg, #00C6FF 0%, #0072FF 100%);
+            --gradient-2: linear-gradient(135deg, #b721ff 0%, #21d4fd 100%);
+            --dark-bg: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
             --text-main: #ffffff;
-            --text-muted: #b0b0c0; /* Slightly lighter for better readability */
+            --text-muted: #b0b0c0;
             --discord: #5865F2;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-main);
             overflow-x: hidden;
-            background: linear-gradient(135deg, #05070a 0%, #1a0b2e 100%);
+            background: radial-gradient(circle at 50% 0%, #1a0b2e 0%, #05070a 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* --- BACKGROUND FX --- */
-        .glow-orb {
-            position: fixed;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(0,255,255,0.05) 0%, rgba(0,0,0,0) 70%);
-            border-radius: 50%;
-            top: -200px;
-            left: -200px;
+        .glow-spot {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(120, 75, 160, 0.15) 0%, transparent 70%);
+            top: -100px; left: 50%;
+            transform: translateX(-50%);
             z-index: -1;
-            animation: float 15s infinite ease-in-out;
             pointer-events: none;
         }
 
-        .glow-orb.secondary {
-            top: auto;
-            bottom: -300px;
-            left: auto;
-            right: -200px;
-            background: radial-gradient(circle, rgba(189, 0, 255, 0.05) 0%, rgba(0,0,0,0) 70%);
-            animation: float 18s infinite ease-in-out reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(40px, 40px); }
-        }
-
-        /* --- HEADER & NAV --- */
         header {
             text-align: center;
-            margin-top: 60px;
-            margin-bottom: 30px;
+            margin-top: 70px;
+            margin-bottom: 40px;
             padding: 0 20px;
-            animation: fadeInDown 0.8s ease;
+            animation: fadeIn 1s ease;
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
+            font-size: 3.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            background: linear-gradient(90deg, #fff, #e0e0e0);
+            background: var(--gradient-2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 20px rgba(183, 33, 255, 0.3));
         }
 
         .subtitle {
-            color: var(--cyan);
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
             font-size: 1.1rem;
-            opacity: 0.9;
-            letter-spacing: 0.5px;
-        }
-
-        /* --- NAVIGATION TABS --- */
-        .nav-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 50px;
-            z-index: 10;
-            background: rgba(255,255,255,0.03);
-            padding: 5px;
-            border-radius: 50px;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 10px 25px;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .nav-btn:hover {
-            color: #fff;
+            color: #ccc;
+            letter-spacing: 1px;
             background: rgba(255,255,255,0.05);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            display: inline-block;
         }
 
-        .nav-btn.active {
-            background: var(--cyan);
-            color: #000;
-            font-weight: 600;
-        }
-
-        /* --- DISCORD BUTTON --- */
         .discord-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
             background-color: var(--discord);
             color: white;
-            padding: 12px 25px;
-            border-radius: 8px;
+            padding: 14px 30px;
+            border-radius: 100px;
             text-decoration: none;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            margin-bottom: 40px;
-            transition: all 0.2s ease;
+            font-weight: 600;
+            margin-bottom: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.3);
             border: 1px solid rgba(255,255,255,0.1);
         }
 
         .discord-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(88, 101, 242, 0.5);
             background-color: #4752c4;
-            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.4);
         }
 
-        .discord-icon {
-            width: 24px;
-            height: 24px;
-            fill: white;
+        .discord-icon { width: 24px; height: 24px; fill: white; }
+
+        .nav-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 50px;
+            z-index: 10;
         }
 
-        /* --- TAB CONTENT HANDLING --- */
-        .tab-content {
-            display: none;
-            width: 100%;
-            max-width: 1000px;
-            padding: 0 20px;
-            animation: slideUp 0.4s forwards;
+        .nav-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .tab-content.active {
-            display: block;
+        .nav-btn.active {
+            background: var(--text-main);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
 
-        /* --- FEATURE GRID --- */
+        .tab-content { display: none; width: 100%; max-width: 1100px; padding: 0 20px; animation: slideUp 0.5s forwards; }
+        .tab-content.active { display: block; }
+
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
             margin-bottom: 50px;
         }
 
         .card {
-            background: var(--glass-bg);
+            background: linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 30px;
-            backdrop-filter: blur(15px);
-            transition: transform 0.2s ease, border-color 0.2s ease;
-            position: relative;
-            overflow: hidden;
+            border-radius: 24px;
+            padding: 8px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card-inner {
+            background: #0a0b10;
+            border-radius: 18px;
+            padding: 25px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-8px);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        /* Colored top accent lines */
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+        .card-img-wrapper {
             width: 100%;
-            height: 3px;
-            background: var(--cyan);
-            opacity: 0.7;
+            height: 180px;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
         }
-        .card.risk::before { background: var(--pink); }
-        .card.raid::before { background: var(--purple); }
 
-        .card-icon {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            display: block;
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            display: block; /* Ensures images are visible */
         }
+
+        .card:hover .card-img { transform: scale(1.05); }
 
         .card h3 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
             color: #fff;
-            font-size: 1.25rem;
             margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
+        .card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
 
-        .highlight {
-            color: var(--cyan);
-            font-weight: 600;
-        }
-
-        .warning {
-            color: var(--pink);
-            font-weight: 600;
-        }
-
-        /* --- LEGAL SECTIONS --- */
         .legal-section {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 40px;
+            border-radius: 24px;
+            padding: 50px;
             margin-bottom: 30px;
-            backdrop-filter: blur(20px);
         }
 
-        .legal-section h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            color: #fff;
-            border-left: 3px solid var(--cyan);
-            padding-left: 20px;
-        }
+        .legal-section h2 { font-family: 'Orbitron', sans-serif; color: #fff; margin-bottom: 30px; font-size: 2rem; }
+        .legal-section h3 { color: #fff; margin-top: 30px; margin-bottom: 15px; }
+        .legal-section p, .legal-section ul { color: var(--text-muted); line-height: 1.7; margin-bottom: 15px; }
+        .legal-section ul { margin-left: 20px; }
 
-        .legal-section h3 {
-            color: #fff;
-            margin-top: 25px;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .legal-section ul {
-            margin-left: 20px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-        
-        .legal-section p {
-            color: var(--text-muted);
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        /* --- ANIMATIONS --- */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- FOOTER --- */
-        footer {
-            margin-top: auto;
-            padding: 40px;
-            text-align: center;
-            color: #666;
-            font-size: 0.85rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            width: 100%;
-        }
-
-        /* Mobile */
         @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
+            h1 { font-size: 2.5rem; }
             .feature-grid { grid-template-columns: 1fr; }
-            .nav-container { width: 90%; justify-content: space-between; }
-            .nav-btn { padding: 10px 15px; font-size: 0.8rem; }
-            section { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="glow-orb"></div>
-    <div class="glow-orb secondary"></div>
+    <div class="glow-spot"></div>
 
     <header>
         <h1>Trivia Bot</h1>
@@ -325,9 +219,7 @@
     </header>
 
     <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="discord-btn">
-        <svg class="discord-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z"/>
-        </svg>
+        <svg class="discord-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z"/></svg>
         Join Support Server
     </a>
 
@@ -340,125 +232,79 @@
         <div class="feature-grid">
             
             <div class="card">
-                <span class="card-icon">🧠</span>
-                <h3>Trivia Engine</h3>
-                <p>Questions are posted automatically every 20 minutes. Compete against the server to answer correctly and maintain your daily streak.
-                <br><br>
-                <span class="highlight">Reward:</span> Credits & Experience.</p>
+                <div class="card-inner">
+                    <div class="card-img-wrapper">
+                        <img src="images/trivia_demo.jpg" class="card-img" alt="Trivia Question Interface">
+                    </div>
+                    <h3>Trivia Engine</h3>
+                    <p>Questions drop automatically every 20 minutes. Compete against the server to maintain your daily streak.</p>
+                </div>
             </div>
 
             <div class="card">
-                <span class="card-icon">💎</span>
-                <h3>Economy & Market</h3>
-                <p>Earn credits through gameplay to purchase powerups in the <span class="highlight">/shop</span>. Users can also list rare items in the <span class="highlight">/auction</span> house, allowing for a player-driven economy.</p>
-            </div>
-
-            <div class="card risk">
-                <span class="card-icon">⚔️</span>
-                <h3>Competitive Duels</h3>
-                <p>Challenge other users to 1v1 trivia matches.
-                <br><br>
-                <strong>High Stakes Mode:</strong>
-                <br>In 'Risky' mode, if the winner answers 5/5 questions correctly, they will transfer <span class="warning">30%</span> of the loser's credit balance to their own wallet.</p>
-            </div>
-
-            <div class="card raid">
-                <span class="card-icon">👹</span>
-                <h3>Live Events (Raids)</h3>
-                <p>Cooperative 'Boss Raid' events spawn randomly. The server must work together to answer questions and deplete the Boss's HP.
-                <br><br>
-                <span class="highlight">Rewards:</span> Key Fragments & Rare Drops.</p>
+                <div class="card-inner">
+                    <div class="card-img-wrapper">
+                        <img src="images/shop_demo.jpg" class="card-img" alt="Shop Interface">
+                    </div>
+                    <h3>Economy & Market</h3>
+                    <p>Earn credits to buy powerups in the <strong>/shop</strong> or list rare items in the <strong>/auction</strong> house.</p>
+                </div>
             </div>
 
             <div class="card">
-                <span class="card-icon">💳</span>
-                <h3>Profile Customization</h3>
-                <p>View detailed statistics and generate custom Rank Cards using <span class="highlight">/rank</span>. Users can unlock specific color gradients for their cards by purchasing roles.</p>
+                <div class="card-inner">
+                    <div class="card-img-wrapper">
+                        <img src="images/duel_demo.jpg" class="card-img" alt="Duel System">
+                    </div>
+                    <h3>Competitive Duels</h3>
+                    <p>Challenge others to 1v1 battles. <strong>Risky Mode:</strong> If the winner gets 5/5, they steal 30% of the loser's wallet.</p>
+                </div>
             </div>
 
-             <div class="card">
-                <span class="card-icon">🤖</span>
-                <h3>Dynamic Content</h3>
-                <p>The bot utilizes AI to generate questions across various categories (Science, History, Media, Logic), ensuring that content remains fresh and rarely repeats.</p>
+            <div class="card">
+                <div class="card-inner">
+                    <div class="card-img-wrapper">
+                        <img src="images/rank_demo.jpg" class="card-img" alt="User Rank Card">
+                    </div>
+                    <h3>Profile Customization</h3>
+                    <p>View detailed stats with <strong>/rank</strong>. Unlock custom color gradients for your card by purchasing roles.</p>
+                </div>
             </div>
 
         </div>
     </div>
 
     <div id="legal" class="tab-content">
-        
         <div class="legal-section">
             <h2>Terms of Service</h2>
             <p><strong>Last Updated:</strong> December 2025</p>
-
-            <h3>1. Acceptance of Terms</h3>
-            <p>By inviting or using the Trivia Bot ("the Service") in your Discord server, you agree to these Terms. If you do not agree, please discontinue use immediately.</p>
-
-            <h3>2. User Conduct</h3>
-            <ul>
-                <li><strong>Fair Play:</strong> The use of self-bots, macros, or scripts to automate answers or farm credits is prohibited.</li>
-                <li><strong>Exploits:</strong> Intentionally abusing bugs to gain an economic advantage may result in a ban or economy reset.</li>
-            </ul>
-
-            <h3>3. Virtual Currency & Mechanics</h3>
-            <p>The "Credits" and items within the bot are virtual currencies with no real-world value. We reserve the right to reset or wipe the economy at any time for balancing purposes (e.g., Seasonal Resets).</p>
-
-            <h3>4. The "High Stakes" Duel</h3>
-            <p>By accepting a Duel in "Risky" mode, you acknowledge the risk of virtual asset loss. Specifically, if your opponent achieves a perfect score (5/5), 30% of your current credit balance will be deducted. This action is irreversible.</p>
+            <h3>1. Fair Play</h3>
+            <p>The use of self-bots, macros, or scripts to automate answers or farm credits is prohibited. Intentionally abusing bugs to gain an economic advantage may result in a ban.</p>
+            <h3>2. Virtual Currency</h3>
+            <p>Credits and items within the bot are virtual currencies with no real-world value. We reserve the right to reset the economy for seasonal balancing.</p>
+            <h3>3. High Stakes Duels</h3>
+            <p>By accepting a "Risky" Duel, you acknowledge that 30% of your credits will be deducted if your opponent achieves a perfect score.</p>
         </div>
 
         <div class="legal-section">
-            <h2 style="border-left-color: var(--pink);">Privacy Policy</h2>
+            <h2>Privacy Policy</h2>
             <p><strong>Effective Date:</strong> December 2025</p>
-
-            <h3>1. Data Collection</h3>
-            <p>We collect the minimum amount of data required for the bot's functionality:</p>
+            <h3>Data Collection</h3>
             <ul>
-                <li><strong>Discord User ID:</strong> Used to associate scores, inventory, and rank with your account.</li>
+                <li><strong>User ID:</strong> Used to track scores, inventory, and rank.</li>
                 <li><strong>Server Settings:</strong> We store the Channel ID configured for trivia output.</li>
-                <li><strong>Temporary Data:</strong> Display Names and Avatars are accessed briefly to generate images but are not permanently stored on our servers.</li>
+                <li><strong>Temporary Data:</strong> Avatars are accessed briefly to generate images but not stored.</li>
             </ul>
-
-            <h3>2. Data Usage</h3>
-            <p>Your data is used solely to:</p>
-            <ul>
-                <li>Maintain global leaderboards and user profiles.</li>
-                <li>Track inventory ownership and auction history.</li>
-                <li>Calculate game statistics (e.g., accuracy streaks).</li>
-            </ul>
-
-            <h3>3. Third-Party Services</h3>
-            <p>Trivia content is generated via OpenRouter APIs. When generating a question, no personal user data is transmitted to the AI provider.</p>
-
-            <h3>4. Data Deletion</h3>
-            <p>If you wish to have your data removed from the system, please join our Support Server and submit a request. Upon deletion, all game progress and stats will be permanently lost.</p>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Trivia Bot. Powered by Xiaomi AI via OpenRouter.<br>
-        Not affiliated with Discord Inc.</p>
-    </footer>
-
     <script>
         function switchTab(tabId, btnElement) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove active class from all buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Show selected tab
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            
-            // Add active class to clicked button
             btnElement.classList.add('active');
         }
     </script>
-
 </body>
 </html>
