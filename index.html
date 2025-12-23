@@ -28,17 +28,26 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
             color: var(--text-main);
             overflow-x: hidden;
-            background: linear-gradient(135deg, #05070a 0%, #11081f 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            
+            /* --- GRADIENT ANIMATION --- */
+            background: linear-gradient(300deg, #05070a, #11081f, #0a1525, #1a0b2e);
+            background-size: 240% 240%;
+            animation: gradientBG 18s ease infinite;
         }
 
-        /* --- BACKGROUND FX --- */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- BACKGROUND ORBS --- */
         .glow-orb {
             position: fixed;
             width: 800px;
@@ -371,8 +380,10 @@
 
              <div class="card">
                 <span class="card-icon">🤖</span>
-                <h3>AI Generation</h3>
-                <p>Powered by advanced AI to generate infinite, non-repetitive questions for specialized categories like "Vocaloid" or "Sci-Fi".</p>
+                <h3>Dynamic Content</h3>
+                <p>Powered by AI to generate infinite questions for specialized categories.
+                <br><br>
+                <span class="highlight">Note:</span> This feature is currently exclusive to our Official Support Server.</p>
             </div>
         </div>
     </div>
@@ -389,13 +400,18 @@
 
                 <h3>2. Usage & Conduct</h3>
                 <ul>
-                    <li><strong>Fair Play:</strong> Users are prohibited from using self-bots, macros, or scripts to automate gameplay (e.g., answering questions or farming credits).</li>
-                    <li><strong>No Exploits:</strong> Intentionally abusing bugs or glitches for economic gain is strictly forbidden and will result in an immediate ban and data wipe.</li>
-                    <li><strong>Respect:</strong> You may not use the Service to generate harassment, hate speech, or illegal content via custom inputs (if applicable).</li>
+                    <li><strong>Fair Play:</strong> Users are prohibited from using self-bots, macros, or scripts to automate gameplay.</li>
+                    <li><strong>No Exploits:</strong> Intentionally abusing bugs for economic gain will result in an immediate ban and data wipe.</li>
+                    <li><strong>Respect:</strong> You may not use the Service to generate harassment, hate speech, or illegal content via custom inputs.</li>
                 </ul>
 
-                <h3>3. Virtual Currency Disclaimer</h3>
-                <p>The "Credits", "Items", and "Experience" accumulated within the Service are virtual game assets with <strong>no real-world monetary value</strong>. We reserve the right to modify, reset, or wipe these assets at any time for game balancing or technical reasons (see "Seasonal Resets").</p>
+                <h3>3. Rights We Reserve</h3>
+                <p>To ensure the best experience for all users, we reserve the following rights:</p>
+                <ul>
+                    <li><strong>Modification:</strong> We may update, change, or discontinue any aspect of the Service at any time without prior notice.</li>
+                    <li><strong>Service Termination:</strong> We reserve the right to permanently or temporarily terminate the Service for any reason.</li>
+                    <li><strong>AI Disclaimer:</strong> Artificial Intelligence is used to generate some content. We do not guarantee the accuracy of AI-generated questions or answers.</li>
+                </ul>
 
                 <h3>4. Availability & Liability</h3>
                 <p>The Service is provided "as is" and "as available". We do not guarantee 100% uptime or data persistence. We are not liable for any loss of virtual data resulting from server outages, Discord API failures, or database corruptions.</p>
@@ -413,22 +429,19 @@
                     <li><strong>Game Data:</strong> We store your gameplay history, including answer streaks, items owned, and duel records.</li>
                 </ul>
 
-                <h3>2. Data Accuracy & Correction</h3>
-                <p>We do not permanently store your Username or Avatar. These are fetched in real-time from Discord's API whenever a command (like <code>/profile</code>) is run. Therefore, if you update your Discord profile, the bot will reflect these changes automatically upon the next interaction.</p>
-
-                <h3>3. Data Retention & Disposal</h3>
+                <h3>2. Data Retention & Disposal</h3>
                 <p>We believe in data minimization. Your data is handled as follows:</p>
                 <ul>
-                    <li><strong>Active Storage:</strong> Data is stored in a secure cloud database (MongoDB Atlas) while you use the bot.</li>
-                    <li><strong>Seasonal Resets:</strong> To maintain game balance, we perform "Seasonal Resets" periodically. During a reset, all economy data (credits, consumables) is strictly deleted. Only permanent collectables and historical badges may remain.</li>
-                    <li><strong>Backups:</strong> Temporary backups are generated during maintenance. These are automatically deleted from our hosting environment immediately after verification to ensure no residual data remains on our servers.</li>
+                    <li><strong>Active Storage:</strong> Data is stored in a secure, encrypted cloud database while you use the bot.</li>
+                    <li><strong>Seasonal Resets:</strong> To maintain game balance, we perform "Seasonal Resets" periodically. During a reset, all economy data (credits, consumables) is strictly deleted.</li>
+                    <li><strong>Backups:</strong> Temporary backups are generated during maintenance. These are automatically deleted from our hosting environment immediately after verification.</li>
                 </ul>
 
-                <h3>4. Your Rights (Deletion & Access)</h3>
+                <h3>3. Your Rights (Deletion & Access)</h3>
                 <p>You have full control over your data:</p>
                 <ul>
                     <li><strong>Request Deletion:</strong> You may request the permanent deletion of all your data (Account Wipe) by opening a support ticket in our official Discord Server.</li>
-                    <li><strong>Processing:</strong> Upon request, your User ID will be removed from our database. This action is irreversible and will result in the loss of all progress.</li>
+                    <li><strong>Processing:</strong> Upon request, your User ID will be removed from our database. This action is irreversible.</li>
                 </ul>
             </div>
 
