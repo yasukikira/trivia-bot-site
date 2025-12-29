@@ -6,24 +6,24 @@
     <title>Trivia Bot | The Protocol</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@600;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
 
     <style>
         :root {
-            /* SYNTHWAVE PALETTE */
-            --bg-deep: #0b001a;
-            --neon-pink: #ff00ff;
-            --neon-cyan: #00ffff;
-            --sun-yellow: #ffbd00;
-            --sun-orange: #ff5500;
-            --grid-color: rgba(255, 0, 255, 0.3);
+            --bg-deep: #050011;
+            --neon-pink: #ff0055;
+            --neon-purple: #bd00ff;
+            --neon-cyan: #00f3ff;
+            --sun-yellow: #ffd700;
+            --sun-orange: #ff4800;
             
-            --glass-bg: rgba(20, 10, 40, 0.75);
-            --glass-border: rgba(255, 100, 255, 0.15);
-            --text-main: #f0f0f0;
-            --text-muted: #b0a0c0;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #a0a0c0;
             
-            --glow-pink: 0 0 15px rgba(255, 0, 255, 0.4);
-            --glow-cyan: 0 0 15px rgba(0, 255, 255, 0.4);
+            --glow-pink: 0 0 20px rgba(255, 0, 85, 0.5);
+            --glow-cyan: 0 0 20px rgba(0, 243, 255, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
@@ -36,20 +36,21 @@
             min-height: 100vh;
         }
 
-        /* --- CRT SCANLINE OVERLAY --- */
+        /* --- VINTAGE OVERLAY --- */
         body::after {
-            content: "";
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
+            content: " ";
+            display: block;
+            position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
             z-index: 9999;
+            pointer-events: none;
         }
 
         /* --- 3D CANVAS --- */
         #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* --- STARTUP --- */
+        /* --- STARTUP SCREEN --- */
         #startup-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 10000;
@@ -60,38 +61,50 @@
             font-family: 'Orbitron'; font-size: clamp(2rem, 6vw, 4rem);
             background: linear-gradient(to bottom, var(--sun-yellow), var(--sun-orange));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px var(--sun-orange);
-            margin-bottom: 20px; letter-spacing: 2px;
+            text-shadow: 0 0 40px var(--sun-orange);
+            margin-bottom: 20px; letter-spacing: 4px;
         }
-        #startup-overlay p { color: var(--neon-cyan); font-family: 'JetBrains Mono'; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        #startup-overlay p { color: var(--neon-cyan); font-family: 'JetBrains Mono'; animation: pulse 1.5s infinite; letter-spacing: 2px; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* --- NAVIGATION --- */
+        /* --- NAVIGATION (Glassium) --- */
         nav {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; display: flex; gap: 8px;
-            background: rgba(10, 0, 20, 0.8);
-            padding: 8px 12px; border-radius: 4px;
-            border: 1px solid var(--neon-pink);
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
-            backdrop-filter: blur(10px); width: max-content; max-width: 95%;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; display: flex; gap: 15px;
+            background: rgba(20, 20, 40, 0.4);
+            padding: 10px 15px; border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: max-content; max-width: 90%;
         }
-        .nav-btn {
-            background: transparent; border: none; color: var(--text-muted);
-            padding: 8px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
-            transition: all 0.2s; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .nav-btn:hover { color: #fff; text-shadow: 0 0 8px #fff; }
-        .nav-btn.active { color: var(--neon-cyan); text-shadow: var(--glow-cyan); border-bottom: 2px solid var(--neon-cyan); }
         
-        .sound-toggle { margin-left: 10px; border-left: 1px solid var(--glass-border); padding-left: 15px; display: flex; align-items: center; }
-        .sound-toggle svg { width: 18px; height: 18px; fill: var(--text-muted); transition: fill 0.3s; }
-        .sound-toggle.active svg { fill: var(--neon-pink); filter: drop-shadow(0 0 5px var(--neon-pink)); }
+        .nav-btn {
+            background: transparent; border: none; color: rgba(255,255,255,0.6);
+            padding: 10px 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.3s ease; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+            border-radius: 30px; text-transform: uppercase;
+        }
+        .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-btn.active { 
+            color: var(--bg-deep); 
+            background: var(--neon-cyan); 
+            box-shadow: 0 0 15px var(--neon-cyan);
+            font-weight: 800;
+        }
+
+        .sound-toggle {
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            cursor: pointer; transition: 0.3s;
+        }
+        .sound-toggle svg { width: 18px; fill: #fff; opacity: 0.5; }
+        .sound-toggle.active { border-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+        .sound-toggle.active svg { fill: var(--neon-pink); opacity: 1; }
 
         /* --- SECTIONS --- */
-        .page-section { display: none; min-height: 100vh; padding: 140px 20px 80px; opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .page-section { display: none; min-height: 100vh; padding: 140px 20px 80px; opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .page-section.active { display: block; opacity: 1; transform: translateY(0); }
 
         /* --- HERO --- */
@@ -99,96 +112,111 @@
         #home.active { display: flex; }
         
         .hero-title {
-            font-family: 'Orbitron'; font-size: clamp(3rem, 10vw, 6rem); font-weight: 900; line-height: 0.9;
-            background: linear-gradient(180deg, #fff 0%, var(--neon-pink) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px rgba(255, 0, 255, 0.4);
-            margin-bottom: 20px; letter-spacing: -2px; transform: skewX(-5deg);
+            font-family: 'Orbitron'; font-size: clamp(3rem, 12vw, 7rem); font-weight: 900; line-height: 1;
+            color: #fff; text-shadow: 0 0 40px rgba(255, 0, 85, 0.6);
+            margin-bottom: 20px; letter-spacing: -2px; mix-blend-mode: screen;
+            transform: skewX(-5deg);
         }
         
         .hero-subtitle {
             font-size: clamp(0.9rem, 3vw, 1.2rem); color: var(--neon-cyan);
             text-transform: uppercase; letter-spacing: 6px; margin-bottom: 50px;
-            text-shadow: var(--glow-cyan); font-weight: 700;
+            text-shadow: 0 0 20px var(--neon-cyan); font-weight: 700;
         }
         
+        /* Glassium Buttons */
         .cta-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         
-        .btn-retro {
-            position: relative; padding: 16px 40px; font-family: 'Orbitron'; font-weight: 700;
-            text-transform: uppercase; color: #fff; background: transparent;
-            border: 2px solid var(--neon-pink); cursor: pointer; overflow: hidden;
-            transition: 0.2s; text-decoration: none; display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.2), inset 0 0 10px rgba(255, 0, 255, 0.1);
+        .btn-glass {
+            position: relative; padding: 18px 45px;
+            font-family: 'Orbitron'; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            color: #fff; text-decoration: none; cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-        .btn-retro::before {
+        
+        .btn-glass::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: 0.5s;
         }
-        .btn-retro:hover { box-shadow: 0 0 20px var(--neon-pink), inset 0 0 20px var(--neon-pink); text-shadow: 0 0 5px #fff; transform: translateY(-2px); }
-        .btn-retro:hover::before { left: 100%; }
         
-        .btn-retro.secondary { border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
-        .btn-retro.secondary:hover { box-shadow: 0 0 20px var(--neon-cyan); color: #fff; }
+        .btn-glass:hover {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
+            transform: translateY(-3px);
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+        .btn-glass:hover::before { left: 100%; }
+
+        .btn-glass.secondary:hover { border-color: var(--neon-cyan); box-shadow: 0 0 30px rgba(0, 243, 255, 0.4); }
 
         /* --- CARDS (Wiki/Legal) --- */
         .docs-container { max-width: 1200px; margin: 0 auto; }
-        .docs-header h1 { text-align: center; font-family: 'Orbitron'; font-size: 2.5rem; margin-bottom: 40px; color: #fff; text-shadow: var(--glow-pink); }
+        .docs-header h1 { text-align: center; font-family: 'Orbitron'; font-size: 2.5rem; margin-bottom: 40px; color: #fff; text-shadow: 0 0 20px var(--neon-cyan); }
         
         .search-bar {
             width: 100%; max-width: 600px; margin: 0 auto 50px; display: block;
-            padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-cyan);
-            color: #fff; font-family: 'JetBrains Mono'; box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
-            transition: 0.3s;
+            padding: 18px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+            border-radius: 12px; color: #fff; font-family: 'JetBrains Mono';
+            backdrop-filter: blur(10px); transition: 0.3s;
         }
-        .search-bar:focus { outline: none; box-shadow: 0 0 20px var(--neon-cyan); }
+        .search-bar:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); }
 
         .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
         
         .guide-card {
-            background: linear-gradient(135deg, rgba(20, 10, 40, 0.9) 0%, rgba(10, 5, 20, 0.95) 100%);
-            border: 1px solid var(--glass-border); position: relative; padding: 25px;
-            transition: 0.3s; overflow: hidden;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid var(--glass-border); border-radius: 16px;
+            padding: 30px; position: relative; overflow: hidden; transition: all 0.4s ease;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         }
-        .guide-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--neon-cyan); transform: scaleX(0); transition: 0.3s; transform-origin: left; }
-        .guide-card:hover { transform: translateY(-5px); border-color: var(--neon-cyan); box-shadow: 0 5px 30px rgba(0,0,0,0.5); }
-        .guide-card:hover::after { transform: scaleX(1); }
+        .guide-card:hover { transform: translateY(-5px); border-color: var(--neon-cyan); box-shadow: 0 10px 40px rgba(0, 243, 255, 0.15); }
         
-        .guide-card.risk { border-color: rgba(255, 0, 100, 0.3); }
-        .guide-card.risk:hover { border-color: #ff0066; }
-        .guide-card.risk:hover::after { background: #ff0066; }
+        .guide-card.risk:hover { border-color: var(--neon-pink); box-shadow: 0 10px 40px rgba(255, 0, 85, 0.15); }
 
         .card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .guide-icon { font-size: 1.8rem; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-        .guide-title h3 { font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; }
-        .guide-title p { color: var(--text-muted); font-size: 0.85rem; font-family: 'JetBrains Mono'; }
+        .guide-icon { font-size: 2rem; }
+        .guide-title h3 { font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; margin-bottom: 5px; }
+        .guide-title p { color: var(--text-muted); font-size: 0.85rem; }
         
         .expand-btn {
             background: rgba(255,255,255,0.05); border: none; color: var(--neon-cyan);
-            width: 100%; padding: 10px; font-family: 'JetBrains Mono'; text-transform: uppercase;
-            cursor: pointer; transition: 0.2s; margin-top: auto; font-size: 0.8rem;
+            width: 100%; padding: 12px; border-radius: 8px; font-family: 'JetBrains Mono'; 
+            text-transform: uppercase; cursor: pointer; transition: 0.2s; margin-top: 15px; font-size: 0.8rem;
         }
-        .expand-btn:hover { background: rgba(0, 255, 255, 0.1); letter-spacing: 1px; }
+        .expand-btn:hover { background: rgba(0, 243, 255, 0.1); color: #fff; }
 
         .details-panel { max-height: 0; overflow: hidden; transition: all 0.5s ease; opacity: 0; }
-        .guide-card.expanded .details-panel { max-height: 800px; opacity: 1; margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--glass-border); }
+        .guide-card.expanded .details-panel { max-height: 800px; opacity: 1; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
         
-        .code-snippet { background: #1a1120; color: var(--neon-pink); padding: 5px 8px; font-family: 'JetBrains Mono'; font-size: 0.8rem; border: 1px solid rgba(255,0,255,0.2); display: inline-block; margin-bottom: 5px; }
+        .code-snippet { background: #000; color: var(--neon-pink); padding: 5px 10px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 0.8rem; border: 1px solid rgba(255,0,85,0.3); display: inline-block; margin-bottom: 10px; }
         
-        .legal-wrapper { max-width: 800px; margin: 0 auto; background: var(--glass-bg); padding: 40px; border: 1px solid var(--glass-border); }
-        .legal-wrapper h2 { font-family: 'Orbitron'; color: #fff; border-bottom: 2px solid var(--neon-pink); padding-bottom: 10px; margin-bottom: 30px; }
-        .legal-block h3 { color: var(--neon-cyan); font-family: 'Orbitron'; margin: 25px 0 10px; }
-        .legal-block p, li { color: var(--text-muted); line-height: 1.6; margin-bottom: 10px; }
+        /* LEGAL SECTION */
+        .legal-wrapper { max-width: 900px; margin: 0 auto; }
+        .legal-block { 
+            background: rgba(10, 10, 15, 0.8); border: 1px solid var(--glass-border); 
+            border-radius: 20px; padding: 40px; margin-bottom: 40px;
+            backdrop-filter: blur(20px);
+        }
+        .legal-block h2 { font-family: 'Orbitron'; color: #fff; border-bottom: 2px solid var(--neon-pink); padding-bottom: 15px; margin-bottom: 30px; font-size: 2rem; }
+        .legal-block h3 { color: var(--neon-cyan); font-family: 'Orbitron'; margin: 30px 0 15px; font-size: 1.2rem; }
+        .legal-block p, li { color: var(--text-muted); line-height: 1.8; margin-bottom: 15px; font-size: 1rem; }
+        .legal-block strong { color: #fff; }
 
-        footer { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); font-size: 0.8rem; font-family: 'JetBrains Mono'; border-top: 1px solid rgba(255,255,255,0.05); background: #000; position: relative; z-index: 10; }
+        footer { text-align: center; padding: 50px; color: rgba(255,255,255,0.3); font-size: 0.8rem; font-family: 'JetBrains Mono'; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 10; background: #050011; }
 
         @media (max-width: 768px) {
-            .hero-title { font-size: 13vw; }
+            .hero-title { font-size: 15vw; }
             .guide-grid { grid-template-columns: 1fr; }
             .cta-group { flex-direction: column; width: 100%; }
-            .btn-retro { width: 100%; justify-content: center; }
-            nav { width: 95%; justify-content: space-between; }
+            .btn-glass { width: 100%; justify-content: center; }
+            nav { width: 95%; flex-wrap: wrap; justify-content: center; top: 15px; }
         }
     </style>
 </head>
@@ -198,7 +226,7 @@
 
     <div id="startup-overlay" onclick="initializeSystem()">
         <h1>SYSTEM READY</h1>
-        <p>[ CLICK TO INITIALIZE ]</p>
+        <p>[ TAP TO INITIALIZE PROTOCOL ]</p>
     </div>
 
     <nav>
@@ -212,14 +240,13 @@
 
     <section id="home" class="page-section active">
         <h1 class="hero-title">TRIVIA<br>PROTOCOL</h1>
-        <div class="hero-subtitle">The Grid Awaits</div>
+        <div class="hero-subtitle">Infinite Knowledge Engine</div>
         
         <div class="cta-group">
-            <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="btn-retro">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z"/></svg>
+            <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="btn-glass">
                 Support Server
             </a>
-            <button onclick="handleNavClick('guide')" class="btn-retro secondary">Access Database</button>
+            <button onclick="handleNavClick('guide')" class="btn-glass secondary">Access Database</button>
         </div>
     </section>
 
@@ -242,11 +269,7 @@
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
                         <div class="code-snippet">/start [channel]</div>
-                        <ul style="list-style:none; color:var(--text-muted); font-size:0.9rem;">
-                            <li>• Timer: 20 Minutes</li>
-                            <li>• Points: 100/250/500</li>
-                            <li>• Global CD: 15 Minutes</li>
-                        </ul>
+                        <p style="color:#aaa;">Timer: 20 Minutes • Points: 100-500 • Global Cooldown: 15m</p>
                     </div>
                 </div>
 
@@ -261,7 +284,7 @@
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
                         <div class="code-snippet">/shop</div>
-                        <p style="color:#aaa; font-size:0.9rem;">Shield (200), Hint (150), Backup (500)</p>
+                        <p style="color:#aaa;">Buy Shield, Hint, Backup. Trade rare items on the Marketplace.</p>
                     </div>
                 </div>
 
@@ -276,7 +299,7 @@
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
                         <div class="code-snippet">/duel [user] Risky</div>
-                        <p style="color:#aaa; font-size:0.9rem;">Fee: 50 CR. Cooldown: 20h. Theft: 30% of loser's wallet on 5-0 win.</p>
+                        <p style="color:#aaa;">Fee: 50 CR. Theft: 30% of loser's wallet on 5-0 win.</p>
                     </div>
                 </div>
 
@@ -291,7 +314,7 @@
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
                         <div class="code-snippet">/raid_start</div>
-                        <p style="color:#aaa; font-size:0.9rem;">DMG: 500 per hit. Loot based on DMG dealt. Killer bonus: 3000 CR.</p>
+                        <p style="color:#aaa;">DMG: 500 per hit. Loot based on DMG dealt.</p>
                     </div>
                 </div>
             </div>
@@ -303,23 +326,30 @@
             <div id="tos" class="legal-block">
                 <h2>Terms of Service</h2>
                 <p><strong>Effective Date:</strong> December 2025</p>
-                <h3>1. Agreement to Terms</h3>
-                <p>By interacting with Trivia Bot ("the Service"), you agree to these Terms.</p>
-                <h3>2. Usage & Conduct</h3>
-                <ul>
-                    <li><strong>Fair Play:</strong> No self-bots, macros, or alts.</li>
-                    <li><strong>No Exploits:</strong> Abuse of bugs results in bans.</li>
-                </ul>
+                <h3>1. Agreement</h3>
+                <p>By using Trivia Bot, you agree to these terms. Misuse results in permanent bans.</p>
+                <h3>2. Fair Play</h3>
+                <p>Automation, macros, and alt-farming are strictly prohibited.</p>
                 <h3>3. Virtual Assets</h3>
-                <p>Credits have <strong>no real-world value</strong>. Real Money Trading (RMT) is strictly prohibited.</p>
+                <p>Credits have no real-world monetary value.</p>
             </div>
             
-            <div id="privacy" class="legal-block" style="margin-top:50px;">
+            <div id="privacy" class="legal-block">
                 <h2 style="border-color: var(--neon-cyan);">Privacy Policy</h2>
+                
                 <h3>1. Data Collection</h3>
-                <p>We store User IDs (Inventory), Guild IDs (Config), and Game Stats.</p>
-                <h3>2. Data Retention</h3>
-                <p>Data is stored in MongoDB Atlas. Seasonal resets may wipe economy data.</p>
+                <p>We collect User IDs (Inventory), Guild IDs (Config), and Gameplay Statistics.</p>
+                
+                <h3>2. Seasonal Wipes & Data Retention</h3>
+                <p>To ensure fair competition and system health, we enforce <strong>Seasonal Resets</strong>. The data handling policy during a reset is as follows:</p>
+                <ul>
+                    <li><strong>Deleted Data (The Wipe):</strong> All <strong>Economy Data</strong> is permanently deleted. This includes Credits, Inventory Items, Badges, Duel Records, Market Listings, and Active Auctions.</li>
+                    <li><strong>Retained Data (Security):</strong> Your <strong>User ID</strong> and <strong>Ban History</strong> are strictly retained. This ensures that users banned for exploiting cannot return after a season reset.</li>
+                    <li><strong>Reset Values:</strong> User profiles are not deleted but reset to default values (Credits: 100, Streaks: 0).</li>
+                </ul>
+                
+                <h3>3. Rights</h3>
+                <p>You may request a full account deletion via our Support Server, effectively removing your ID from our database.</p>
             </div>
         </div>
     </section>
@@ -329,12 +359,12 @@
     </footer>
 
     <script>
-        // --- 1. SYNTHWAVE AUDIO ENGINE ---
-        class AudioEngine {
+        // --- 1. PROCEDURAL AUDIO ENGINE (LOOP PROOF) ---
+        class SynthEngine {
             constructor() {
                 this.ctx = null;
                 this.masterGain = null;
-                this.filter = null;
+                this.oscillators = [];
             }
             
             init() {
@@ -344,44 +374,90 @@
                 this.masterGain.connect(this.ctx.destination);
                 this.masterGain.gain.value = 0;
 
-                // Create Filter (The "Wah" effect)
-                this.filter = this.ctx.createBiquadFilter();
-                this.filter.type = "lowpass";
-                this.filter.frequency.value = 400;
-                this.filter.Q.value = 5;
-                this.filter.connect(this.masterGain);
+                // --- LAYER 1: THE WARM PAD (Chords) ---
+                // FMaj7 chord (F, A, C, E) spread out
+                const freqs = [87.31, 110.00, 130.81, 164.81]; 
+                
+                freqs.forEach((f, i) => {
+                    const osc = this.ctx.createOscillator();
+                    osc.type = "sawtooth";
+                    osc.frequency.value = f;
+                    
+                    // Detune for analog warmth
+                    osc.detune.value = (Math.random() - 0.5) * 10; 
 
-                // Create Oscillator Drones (Sawtooth for retro feel)
-                const freqs = [55, 55.5, 110, 164.8]; // A1, A1(detuned), A2, E3
-                freqs.forEach(f => this.createOsc(f));
+                    // Lowpass Filter (The muffled underwater sound)
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = "lowpass";
+                    filter.frequency.value = 300; 
+                    filter.Q.value = 1;
 
-                // LFO to modulate filter (Breathing effect)
-                const lfo = this.ctx.createOscillator();
-                lfo.type = "sine";
-                lfo.frequency.value = 0.1; // Slow pulse
-                const lfoGain = this.ctx.createGain();
-                lfoGain.gain.value = 300; // Filter sweep range
-                lfo.connect(lfoGain);
-                lfoGain.connect(this.filter.frequency);
-                lfo.start();
+                    // LFO for filter movement (Breathing)
+                    const lfo = this.ctx.createOscillator();
+                    lfo.type = "sine";
+                    lfo.frequency.value = 0.05 + (Math.random() * 0.05); // Very slow
+                    const lfoGain = this.ctx.createGain();
+                    lfoGain.gain.value = 100; // Modulate filter by 100Hz
+                    
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(filter.frequency);
+                    lfo.start();
+
+                    const oscGain = this.ctx.createGain();
+                    oscGain.gain.value = 0.08; // Mix level
+
+                    osc.connect(filter);
+                    filter.connect(oscGain);
+                    oscGain.connect(this.masterGain);
+                    osc.start();
+                    this.oscillators.push(osc);
+                });
+
+                // --- LAYER 2: PINK NOISE (The "Waves") ---
+                const bufferSize = 2 * this.ctx.sampleRate;
+                const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    output[i] = (lastOut + (0.02 * white)) / 1.02;
+                    lastOut = output[i];
+                    output[i] *= 3.5; 
+                }
+                var lastOut = 0;
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = noiseBuffer;
+                noise.loop = true;
+                
+                const noiseFilter = this.ctx.createBiquadFilter();
+                noiseFilter.type = "bandpass";
+                noiseFilter.frequency.value = 600; 
+                
+                // LFO for Waves
+                const waveLfo = this.ctx.createOscillator();
+                waveLfo.type = "sine";
+                waveLfo.frequency.value = 0.15; // Speed of waves
+                const waveGain = this.ctx.createGain();
+                waveGain.gain.value = 0.02; // Volume of waves
+                
+                // VCA (Voltage Controlled Amplifier) approach for volume swelling
+                const volumeLfo = this.ctx.createGain();
+                volumeLfo.gain.value = 0; 
+                waveLfo.connect(volumeLfo.gain);
+                
+                noise.connect(noiseFilter);
+                noiseFilter.connect(volumeLfo);
+                volumeLfo.connect(this.masterGain);
+                
+                noise.start();
+                waveLfo.start();
             }
 
-            createOsc(f) {
-                const osc = this.ctx.createOscillator();
-                osc.type = "sawtooth";
-                osc.frequency.value = f;
-                const gain = this.ctx.createGain();
-                gain.gain.value = 0.08; // Keep volume low
-                osc.connect(gain);
-                gain.connect(this.filter);
-                osc.start();
-            }
-
-            fadeIn() { if(this.ctx) this.masterGain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 2); }
+            fadeIn() { if(this.ctx) this.masterGain.gain.setTargetAtTime(0.5, this.ctx.currentTime, 3); }
             fadeOut() { if(this.ctx) this.masterGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5); }
         }
 
-        const audio = new AudioEngine();
+        const audio = new SynthEngine();
         let soundOn = false;
 
         function initializeSystem() {
@@ -406,97 +482,116 @@
             }
         }
 
-        // --- 2. THREE.JS SYNTHWAVE SCENE ---
+        // --- 2. THREE.JS WAVE SCENE ---
         const init3D = () => {
             const container = document.getElementById('canvas-container');
             const scene = new THREE.Scene();
-            // Fog for the "fade into distance" look
-            scene.fog = new THREE.FogExp2(0x0b001a, 0.0025); 
+            scene.fog = new THREE.FogExp2(0x050011, 0.002); // Deep purple fog
 
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
-            camera.position.set(0, 50, 400); // Position camera above grid
+            camera.position.set(0, 30, 100); 
 
-            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(renderer.domElement);
 
             // --- A. THE RETRO SUN ---
-            // Create a canvas texture for the stripes
-            const canvas = document.createElement('canvas');
-            canvas.width = 128; canvas.height = 128;
-            const ctx = canvas.getContext('2d');
+            const sunCanvas = document.createElement('canvas');
+            sunCanvas.width = 128; sunCanvas.height = 128;
+            const ctx = sunCanvas.getContext('2d');
             const grad = ctx.createLinearGradient(0, 0, 0, 128);
-            grad.addColorStop(0, '#ffbd00'); // Yellow
-            grad.addColorStop(1, '#ff5500'); // Orange
+            grad.addColorStop(0, '#ffd700'); 
+            grad.addColorStop(1, '#ff4800');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 128, 128);
-            // Stripes
-            ctx.fillStyle = '#0b001a'; // Background color
-            for(let y=64; y<128; y+=8) ctx.fillRect(0, y, 128, 2 + (y-64)/8); // Thicker stripes at bottom
+            // Scanlines
+            ctx.fillStyle = '#050011';
+            for(let y=64; y<128; y+=8) ctx.fillRect(0, y, 128, 2 + (y-64)/10);
             
-            const sunTex = new THREE.CanvasTexture(canvas);
-            const sunGeo = new THREE.CircleGeometry(300, 64);
+            const sunTex = new THREE.CanvasTexture(sunCanvas);
             const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, transparent: true, fog: false });
-            const sun = new THREE.Mesh(sunGeo, sunMat);
-            sun.position.z = -800;
-            sun.position.y = 150;
+            const sun = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), sunMat);
+            sun.position.set(0, 80, -500);
             scene.add(sun);
 
-            // --- B. THE INFINITE GRID (ROAD) ---
-            const gridGeo = new THREE.PlaneGeometry(2000, 2000, 40, 40);
-            // Displace vertices to make "mountains" on sides
-            const pos = gridGeo.attributes.position;
-            for(let i=0; i < pos.count; i++){
-                const x = pos.getX(i);
-                // If x is far left or far right, raise z (which is y in scene)
-                if(Math.abs(x) > 200) {
-                    pos.setZ(i, Math.random() * 150 * (Math.abs(x)/1000));
-                }
-            }
-            gridGeo.computeVertexNormals();
+            // Reflection on water
+            const refSun = sun.clone();
+            refSun.scale.y = -1;
+            refSun.position.y = -80;
+            refSun.material = sunMat.clone();
+            refSun.material.opacity = 0.2;
+            scene.add(refSun);
 
-            const gridMat = new THREE.MeshBasicMaterial({ 
-                color: 0xff00ff, 
+            // --- B. THE LIQUID GRID (WAVES) ---
+            const planeGeo = new THREE.PlaneGeometry(1000, 1000, 60, 60);
+            const planeMat = new THREE.MeshBasicMaterial({ 
+                color: 0x00f3ff, 
                 wireframe: true,
-                transparent: true,
-                opacity: 0.3
+                transparent: true, 
+                opacity: 0.25
             });
-            const terrain = new THREE.Mesh(gridGeo, gridMat);
-            terrain.rotation.x = -Math.PI / 2;
-            terrain.position.y = -50;
-            scene.add(terrain);
+            const water = new THREE.Mesh(planeGeo, planeMat);
+            water.rotation.x = -Math.PI / 2;
+            scene.add(water);
 
-            // Duplicate terrain for infinite loop illusion
-            const terrain2 = terrain.clone();
-            terrain2.position.z = -2000;
-            scene.add(terrain2);
+            // Duplicate for infinite scroll
+            const water2 = water.clone();
+            water2.position.z = -1000;
+            scene.add(water2);
 
-            // --- C. STARFIELD ---
-            const starGeo = new THREE.BufferGeometry();
-            const starCnt = 1000;
-            const starPos = new Float32Array(starCnt * 3);
-            for(let i=0; i<starCnt*3; i++) starPos[i] = (Math.random()-0.5) * 2000;
-            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-            const starMat = new THREE.PointsMaterial({color: 0xffffff, size: 2});
-            const stars = new THREE.Points(starGeo, starMat);
-            scene.add(stars);
+            // --- C. MOUNTAINS (WIREFRAME) ---
+            const mtnGeo = new THREE.ConeGeometry(80, 200, 4, 1, true);
+            const mtnMat = new THREE.MeshBasicMaterial({ color: 0xff0055, wireframe: true, transparent:true, opacity: 0.2 });
+            
+            // Left Mountains
+            for(let i=0; i<5; i++) {
+                const m = new THREE.Mesh(mtnGeo, mtnMat);
+                m.position.set(-200 - (Math.random()*100), 0, -i*200);
+                scene.add(m);
+            }
+            // Right Mountains
+            for(let i=0; i<5; i++) {
+                const m = new THREE.Mesh(mtnGeo, mtnMat);
+                m.position.set(200 + (Math.random()*100), 0, -i*200);
+                scene.add(m);
+            }
 
             // --- ANIMATION LOOP ---
+            const simplex = new SimplexNoise();
+            let time = 0;
+
             const animate = () => {
                 requestAnimationFrame(animate);
+                time += 0.005;
 
-                // Move Grid
-                terrain.position.z += 2;
-                terrain2.position.z += 2;
-                // Loop
-                if(terrain.position.z > 1000) terrain.position.z = -3000;
-                if(terrain2.position.z > 1000) terrain2.position.z = -3000;
+                // 1. Move Grid (Infinite Scroll)
+                water.position.z += 1.5;
+                water2.position.z += 1.5;
+                if(water.position.z > 500) water.position.z = -1500;
+                if(water2.position.z > 500) water2.position.z = -1500;
 
-                // Move Stars (Parallax)
-                stars.rotation.z += 0.0005;
+                // 2. Animate Waves (Vertex Displacement)
+                updateWaves(water, time);
+                updateWaves(water2, time);
+
+                // 3. Camera subtle float
+                camera.position.y = 30 + Math.sin(time)*2;
 
                 renderer.render(scene, camera);
             };
+
+            function updateWaves(mesh, t) {
+                const pos = mesh.geometry.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    const x = pos.getX(i);
+                    const y = pos.getY(i); // This is Z in world space
+                    // Create wave effect
+                    const z = Math.sin(x * 0.05 + t) * 5 + Math.sin(y * 0.05 + t) * 5;
+                    pos.setZ(i, z);
+                }
+                pos.needsUpdate = true;
+            }
+
             animate();
 
             window.addEventListener('resize', () => {
