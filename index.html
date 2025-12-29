@@ -13,11 +13,11 @@
             --pink: #ff0096;
             --purple: #bd00ff;
             --dark-bg: #05070a;
-            --glass-bg: rgba(20, 25, 35, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(15, 20, 30, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --text-main: #e0e0e0;
             --text-muted: #9494a8;
-            --discord: #5865F2;
+            --accent-glow: 0 0 20px rgba(0, 255, 255, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
@@ -30,216 +30,198 @@
             min-height: 100vh;
         }
 
+        /* --- VISUAL AMBIANCE (The "More Stuff") --- */
+        /* 1. The Moving Grid */
+        .cyber-grid {
+            position: fixed;
+            top: 0; left: 0; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: gridMove 20s linear infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+        @keyframes gridMove { 0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); } 100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); } }
+
+        /* 2. Floating Ambient Orbs */
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: floatOrb 10s ease-in-out infinite alternate;
+        }
+        .orb-1 { top: 10%; left: 10%; width: 300px; height: 300px; background: var(--purple); }
+        .orb-2 { bottom: 10%; right: 10%; width: 400px; height: 400px; background: var(--cyan); animation-duration: 15s; }
+        @keyframes floatOrb { from { transform: translate(0,0); } to { transform: translate(30px, -30px); } }
+
         /* --- STARTUP OVERLAY --- */
         #startup-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            transition: opacity 0.8s ease;
-            cursor: pointer;
-            padding: 20px;
-            text-align: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            transition: opacity 0.8s ease; cursor: pointer; padding: 20px; text-align: center;
         }
-        
-        #startup-overlay h1 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--cyan);
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            animation: pulse 2s infinite;
-        }
-        
-        #startup-overlay p { margin-top: 15px; color: var(--text-muted); font-size: 1rem; }
+        #startup-overlay h1 { font-family: 'Orbitron'; color: var(--cyan); font-size: clamp(1.5rem, 5vw, 2.5rem); animation: pulse 2s infinite; text-shadow: var(--accent-glow); }
+        #startup-overlay p { margin-top: 15px; color: var(--text-muted); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; text-shadow: 0 0 20px var(--cyan); }
-            50% { opacity: 0.5; text-shadow: 0 0 5px var(--cyan); }
-        }
-
-        /* --- BACKGROUND --- */
-        #canvas-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #11081f 0%, #05070a 80%);
-            transition: opacity 1.5s ease;
-        }
+        /* --- 3D CANVAS --- */
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; opacity: 0.6; transition: opacity 1.5s ease; }
 
         /* --- NAVIGATION --- */
         nav {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: flex;
-            gap: 5px;
-            background: rgba(10, 10, 15, 0.85);
-            padding: 6px;
-            border-radius: 50px;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; display: flex; gap: 5px;
+            background: rgba(5, 5, 10, 0.8);
+            padding: 6px 10px; border-radius: 50px;
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(15px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: max-content;
-            max-width: 95%;
+            width: max-content; max-width: 95%;
         }
-
         .nav-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
+            background: transparent; border: none; color: var(--text-muted);
+            padding: 10px 20px; border-radius: 40px;
+            font-weight: 500; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.3s ease; font-family: 'Inter', sans-serif; white-space: nowrap;
         }
-
         .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .nav-btn.active {
-            background: var(--text-main);
-            color: #000;
-            font-weight: 700;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        }
+        .nav-btn.active { background: var(--text-main); color: #000; font-weight: 700; box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
+
+        /* Sound Toggle specific */
+        .sound-toggle { display: flex; align-items: center; justify-content: center; width: 40px; padding: 0; border-left: 1px solid var(--glass-border); margin-left: 5px; opacity: 0.7; }
+        .sound-toggle.active { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); background: transparent; box-shadow: none; opacity: 1; }
 
         /* --- SECTIONS --- */
-        .page-section {
-            display: none;
-            min-height: 100vh;
-            padding: 120px 20px 60px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        
+        .page-section { display: none; min-height: 100vh; padding: 120px 20px 60px; opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
         .page-section.active { display: block; opacity: 1; transform: translateY(0); }
 
         /* --- HERO --- */
         #home { display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100vh; padding-top: 0; }
         #home.active { display: flex; }
-
         .hero-title {
-            font-family: 'Orbitron', sans-serif;
-            /* Responsive font size: minimum 3rem, preferred 10vw, max 6rem */
-            font-size: clamp(2.5rem, 10vw, 6rem);
-            font-weight: 900;
-            line-height: 1.1;
-            background: linear-gradient(to bottom, #fff, #999);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
-            margin-bottom: 20px;
-            letter-spacing: -2px;
-            padding: 0 10px;
+            font-family: 'Orbitron'; font-size: clamp(3rem, 12vw, 7rem); font-weight: 900; line-height: 1;
+            color: #fff; text-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+            margin-bottom: 20px; letter-spacing: -3px; mix-blend-mode: screen;
         }
-
-        .hero-subtitle {
-            font-size: clamp(0.9rem, 3vw, 1.2rem);
-            color: var(--cyan);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 40px;
-            opacity: 0.8;
-            padding: 0 20px;
-            line-height: 1.5;
-        }
-
-        .cta-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%; padding: 0 20px; }
-
+        .hero-subtitle { font-size: clamp(0.9rem, 3vw, 1.2rem); color: var(--cyan); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; opacity: 0.9; }
+        
+        .cta-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         .btn-primary, .btn-secondary {
-            padding: 16px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 700;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            font-size: 1rem;
-            min-width: 180px;
+            padding: 16px 32px; border-radius: 4px; text-decoration: none; font-weight: 700;
+            transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center;
+            gap: 10px; cursor: pointer; font-size: 1rem; min-width: 180px; text-transform: uppercase; letter-spacing: 1px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
-
         .btn-primary { background: var(--text-main); color: #000; border: none; }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 255, 255, 0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255, 255, 255, 0.4); }
+        .btn-secondary { background: rgba(0,0,0,0.3); color: var(--cyan); border: 1px solid var(--cyan); }
+        .btn-secondary:hover { background: var(--cyan); color: #000; box-shadow: 0 0 20px var(--cyan); }
 
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
-        .btn-secondary:hover { border-color: var(--cyan); color: var(--cyan); }
-
-        /* --- GUIDE --- */
+        /* --- DATABASE (GUIDE) --- */
         .docs-container { max-width: 1200px; margin: 0 auto; }
         .docs-header { text-align: center; margin-bottom: 40px; }
-        .docs-header h1 { font-family: 'Orbitron'; font-size: clamp(1.8rem, 5vw, 2.5rem); margin-bottom: 10px; }
+        .docs-header h1 { font-family: 'Orbitron'; font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 10px; text-shadow: var(--accent-glow); }
         
-        .search-container { position: relative; max-width: 600px; margin: 0 auto 40px; }
-        .search-bar { width: 100%; padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: 1rem; backdrop-filter: blur(10px); }
-        .search-bar:focus { outline: none; border-color: var(--cyan); }
+        .search-bar {
+            width: 100%; max-width: 600px; margin: 0 auto 50px; display: block;
+            padding: 18px 25px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border);
+            border-radius: 8px; color: #fff; font-family: 'Inter'; font-size: 1.1rem;
+            backdrop-filter: blur(10px); transition: border-color 0.3s;
+        }
+        .search-bar:focus { outline: none; border-color: var(--cyan); box-shadow: var(--accent-glow); }
 
-        .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .guide-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 25px; position: relative; overflow: hidden; }
-        .guide-card:hover { border-color: rgba(255,255,255,0.2); }
-        .guide-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--glass-border); transition: background 0.3s; }
-        .guide-card:hover::before { background: var(--cyan); }
-        .guide-card.risk:hover::before { background: var(--pink); }
-        .guide-card.raid:hover::before { background: var(--purple); }
+        .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        
+        /* EXPANDABLE CARDS */
+        .guide-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 25px; position: relative; overflow: hidden; transition: all 0.3s ease;
+            display: flex; flex-direction: column;
+        }
+        .guide-card:hover { border-color: var(--cyan); transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .guide-card.risk:hover { border-color: var(--pink); }
+        
+        /* Card Header (Visible) */
+        .card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .guide-icon { font-size: 1.8rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .guide-title h3 { font-family: 'Orbitron'; font-size: 1.1rem; color: #fff; }
+        .guide-title p { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+        
+        /* Expand Button */
+        .expand-btn {
+            background: rgba(255,255,255,0.05); border: none; color: var(--cyan);
+            width: 100%; padding: 10px; border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono'; font-size: 0.8rem; text-transform: uppercase;
+            transition: background 0.2s; margin-top: auto;
+        }
+        .expand-btn:hover { background: rgba(0, 255, 255, 0.1); }
+        
+        /* Hidden Details (The Accordion) */
+        .details-panel {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.4s ease;
+            opacity: 0; border-top: 1px solid transparent; margin-top: 0;
+        }
+        .guide-card.expanded .details-panel {
+            max-height: 500px; /* Arbitrary large height */
+            opacity: 1; border-top: 1px solid var(--glass-border); margin-top: 15px; padding-top: 15px;
+        }
+        .guide-card.expanded .expand-btn { background: var(--cyan); color: #000; }
 
-        .guide-icon { font-size: 2rem; margin-bottom: 15px; display: block; }
-        .guide-card h3 { font-family: 'Orbitron'; margin-bottom: 12px; color: #fff; font-size: 1.2rem; }
-        .guide-card p { color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; font-size: 0.95rem; }
-        .code-snippet { background: rgba(0,0,0,0.4); padding: 6px 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan); display: inline-block; margin-bottom: 5px; word-break: break-word; }
-
-        .detail-list { list-style: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .detail-list li { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
-        .detail-list li::before { content: '▸'; color: var(--cyan); flex-shrink: 0; }
+        .code-snippet { background: #000; padding: 8px 12px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--pink); margin-bottom: 10px; display: inline-block; border: 1px solid var(--glass-border); }
+        .detail-list { list-style: none; }
+        .detail-list li { font-size: 0.9rem; color: #ccc; margin-bottom: 8px; display: flex; gap: 10px; line-height: 1.5; }
+        .detail-list li::before { content: '>'; color: var(--cyan); font-weight: bold; }
 
         /* --- LEGAL --- */
         .legal-wrapper { max-width: 900px; margin: 0 auto; }
-        .legal-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 40px; margin-bottom: 25px; backdrop-filter: blur(20px); }
-        .legal-card h2 { font-family: 'Orbitron'; font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--glass-border); color: #fff; }
-        .legal-block { margin-bottom: 25px; }
-        .legal-block h3 { color: #fff; margin-bottom: 10px; font-size: 1.1rem; }
+        .legal-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 40px; margin-bottom: 25px; backdrop-filter: blur(20px); scroll-margin-top: 100px;
+        }
+        .legal-card h2 { font-family: 'Orbitron'; font-size: 1.8rem; margin-bottom: 20px; color: #fff; padding-bottom: 15px; border-bottom: 1px solid var(--glass-border); }
+        .legal-block h3 { color: #fff; margin: 20px 0 10px; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .legal-block h3::before { content: ''; display: block; width: 6px; height: 6px; background: var(--cyan); transform: rotate(45deg); }
         .legal-block p, .legal-block ul { color: var(--text-muted); line-height: 1.7; font-size: 0.95rem; }
         .legal-block ul { margin-left: 20px; }
-        .highlight { color: var(--cyan); font-weight: 600; }
-        .warning { color: var(--pink); font-weight: 600; }
+        .highlight { color: var(--cyan); } .warning { color: var(--pink); }
 
-        footer { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.2); font-size: 0.8rem; position: relative; z-index: 10; }
+        footer { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.2); font-size: 0.8rem; position: relative; z-index: 10; }
 
-        /* --- MOBILE SPECIFIC --- */
         @media (max-width: 768px) {
-            nav { top: 15px; padding: 5px; width: 92%; justify-content: space-between; }
-            .nav-btn { padding: 10px 14px; font-size: 0.8rem; flex: 1; }
-            
-            .cta-group { flex-direction: column; width: 100%; gap: 15px; }
+            nav { width: 95%; justify-content: space-between; padding: 8px; }
+            .nav-btn { padding: 8px 12px; font-size: 0.75rem; }
+            .hero-title { font-size: 12vw; }
+            .cta-group { flex-direction: column; width: 100%; }
             .btn-primary, .btn-secondary { width: 100%; }
-            
             .guide-grid { grid-template-columns: 1fr; }
-            .legal-card { padding: 25px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="startup-overlay" onclick="initializeSystem()">
-        <h1>INITIALIZE SYSTEM</h1>
-        <p>[ Tap to Engage Protocol ]</p>
-    </div>
-
+    <div class="cyber-grid"></div>
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
     <div id="canvas-container"></div>
+
+    <div id="startup-overlay" onclick="initializeSystem()">
+        <h1>INITIALIZE</h1>
+        <p>[ Tap to Connect ]</p>
+    </div>
 
     <nav>
         <button id="nav-home" class="nav-btn active" onclick="handleNavClick('home')">Home</button>
         <button id="nav-guide" class="nav-btn" onclick="handleNavClick('guide')">Database</button>
         <button id="nav-legal" class="nav-btn" onclick="handleNavClick('legal')">Legal</button>
+        <button id="sound-btn" class="nav-btn sound-toggle" onclick="toggleSound()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        </button>
     </nav>
 
     <section id="home" class="page-section active">
@@ -247,12 +229,7 @@
         <div class="hero-subtitle">Economy • Factions • Boss Raids</div>
         
         <div class="cta-group">
-            <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="btn-primary">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z"/>
-                </svg>
-                Deploy System
-            </a>
+            <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="btn-primary">Deploy System</a>
             <button onclick="handleNavClick('guide')" class="btn-secondary">Access Database</button>
         </div>
     </section>
@@ -261,305 +238,324 @@
         <div class="docs-container">
             <div class="docs-header">
                 <h1>SYSTEM ARCHIVE</h1>
-                <p style="color: var(--text-muted);">Detailed operational manual for the Trivia Protocol.</p>
             </div>
 
-            <div class="search-container">
-                <input type="text" id="guideSearch" class="search-bar" placeholder="Search protocol (e.g., 'Raid', 'Economy')..." onkeyup="filterGuide()">
-            </div>
+            <input type="text" id="guideSearch" class="search-bar" placeholder="Search protocol (e.g. 'Raid', 'Economy')..." onkeyup="filterGuide()">
 
             <div class="guide-grid">
+                
                 <div class="guide-card" data-keywords="trivia core start loop">
-                    <span class="guide-icon">🧠</span>
-                    <h3>Core Protocol</h3>
-                    <p>The trivia loop runs automatically in designated channels.</p>
-                    <div class="code-snippet">/start [channel]</div>
-                    <ul class="detail-list">
-                        <li>Questions spawn every <strong>20 minutes</strong>.</li>
-                        <li>Categories: History, Science, Anime, Vocaloid (AI).</li>
-                        <li>Correct answers build your <strong>Streak</strong>.</li>
-                        <li>Wrong answers break streaks unless you own a <span class="highlight">Backup Drive</span>.</li>
-                    </ul>
+                    <div class="card-header">
+                        <span class="guide-icon">🧠</span>
+                        <div class="guide-title">
+                            <h3>Core Protocol</h3>
+                            <p>Automated Trivia Loop</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/start [channel]</div>
+                        <ul class="detail-list">
+                            <li>Spawns every <strong>20 minutes</strong>.</li>
+                            <li>Categories: History, Science, Anime, AI.</li>
+                            <li>Build <strong>Streak</strong> for multipliers.</li>
+                            <li>Requires <span class="highlight">Backup Drive</span> to save streak.</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="guide-card" data-keywords="economy shop items auction credits buy sell">
-                    <span class="guide-icon">💳</span>
-                    <h3>Economy & Shop</h3>
-                    <p>Credits (CR) are the system currency. Trade on the global market.</p>
-                    <div class="code-snippet">/shop</div> <div class="code-snippet">/auction_start</div>
-                    <ul class="detail-list">
-                        <li><strong>Shield (200 CR):</strong> Blocks credit theft in Duels.</li>
-                        <li><strong>Decryptor (150 CR):</strong> Hints (Removes 2 options).</li>
-                        <li><strong>Backup (500 CR):</strong> Streak protection.</li>
-                        <li>Auction items on the <span class="highlight">/marketplace</span>.</li>
-                    </ul>
+                <div class="guide-card" data-keywords="economy shop items auction">
+                    <div class="card-header">
+                        <span class="guide-icon">💳</span>
+                        <div class="guide-title">
+                            <h3>Economy</h3>
+                            <p>Credits, Shop & Trade</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/shop</div>
+                        <ul class="detail-list">
+                            <li><strong>Shield (200 CR):</strong> Blocks theft.</li>
+                            <li><strong>Decryptor (150 CR):</strong> Hint system.</li>
+                            <li><strong>Backup (500 CR):</strong> Streak insurance.</li>
+                            <li>Global Auction House via <span class="highlight">/marketplace</span>.</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="guide-card risk" data-keywords="duel pvp fight risky bet wager">
-                    <span class="guide-icon">⚔️</span>
-                    <h3>Duel Systems</h3>
-                    <p>Challenge other users to 1v1 trivia battles. 5 Rounds.</p>
-                    <div class="code-snippet">/duel [user] [wager]</div>
-                    <ul class="detail-list">
-                        <li><strong>Normal Mode:</strong> Friendly practice. No fees.</li>
-                        <li><strong>Risky Mode:</strong> 50 CR Fee. 20h Cooldown.</li>
-                        <li><strong>Theft:</strong> Winning 5-0 steals <span class="warning">30%</span> of loser's wallet.</li>
-                        <li>Spectators can <strong>Bet</strong> on the outcome.</li>
-                    </ul>
+                <div class="guide-card risk" data-keywords="duel pvp risky bet">
+                    <div class="card-header">
+                        <span class="guide-icon">⚔️</span>
+                        <div class="guide-title">
+                            <h3>Duel Systems</h3>
+                            <p>PvP & Wagering</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/duel [user] [wager]</div>
+                        <ul class="detail-list">
+                            <li><strong>Normal:</strong> Practice mode.</li>
+                            <li><strong>Risky:</strong> 50 CR Fee. 20h Cooldown.</li>
+                            <li><strong>Theft:</strong> Win 5-0 to steal <span class="warning">30%</span> wallet.</li>
+                            <li>Spectator Betting enabled.</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="guide-card raid" data-keywords="raid boss hp damage loot">
-                    <span class="guide-icon">👹</span>
-                    <h3>Boss Raids</h3>
-                    <p>Cross-server events where a massive Boss spawns.</p>
-                    <div class="code-snippet">/raid_start [name]</div>
-                    <ul class="detail-list">
-                        <li>Questions drop rapidly (every 20s).</li>
-                        <li>Correct Answer: <strong>500 Damage</strong>.</li>
-                        <li>Wrong Answer: Boss Heals 50 HP.</li>
-                        <li><strong>Loot:</strong> Credits based on damage + Random Rare Drops.</li>
-                    </ul>
+                <div class="guide-card" data-keywords="raid boss hp loot">
+                    <div class="card-header">
+                        <span class="guide-icon">👹</span>
+                        <div class="guide-title">
+                            <h3>Boss Raids</h3>
+                            <p>Co-op Events</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/raid_start [name]</div>
+                        <ul class="detail-list">
+                            <li>Rapid fire questions (20s).</li>
+                            <li>Correct: <strong>500 DMG</strong>.</li>
+                            <li>Wrong: Boss Heals.</li>
+                            <li>Loot: Credits + Legendary Items.</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="guide-card" data-keywords="faction team group war weekly">
-                    <span class="guide-icon">🚩</span>
-                    <h3>Faction Warfare</h3>
-                    <p>Join or create a team to dominate the weekly leaderboard.</p>
-                    <div class="code-snippet">/faction_create</div>
-                    <ul class="detail-list">
-                        <li><strong>Cost:</strong> 10,000 CR to found a faction.</li>
-                        <li>Factions compete for "Score".</li>
-                        <li><strong>Weekly Reset:</strong> Winning faction gets crowned.</li>
-                        <li>Rewards: Leader gets 5k CR. Members get 1k CR.</li>
-                    </ul>
+                <div class="guide-card" data-keywords="faction team war">
+                    <div class="card-header">
+                        <span class="guide-icon">🚩</span>
+                        <div class="guide-title">
+                            <h3>Factions</h3>
+                            <p>Weekly Warfare</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/faction_create</div>
+                        <ul class="detail-list">
+                            <li>Cost: 10k Credits.</li>
+                            <li>Goal: Highest collective score.</li>
+                            <li>Weekly Reset: Sunday.</li>
+                            <li>Rewards: 5k Leader / 1k Members.</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="guide-card" data-keywords="collectables inventory drop rarity master key">
-                    <span class="guide-icon">🎒</span>
-                    <h3>Rare Collectables</h3>
-                    <p>Find items via Flash Drops or Chests.</p>
-                    <div class="code-snippet">/inventory</div> <div class="code-snippet">/craft</div>
-                    <ul class="detail-list">
-                        <li><strong>Rarities:</strong> Common to Legendary.</li>
-                        <li><strong>Flash Drops:</strong> Spawn randomly in channels.</li>
-                        <li><strong>Master Key:</strong> Crafted from 9 Fragments. Opens Chests.</li>
-                        <li><strong>Chests:</strong> Contain powerups or Legendary items.</li>
-                    </ul>
+                 <div class="guide-card" data-keywords="collectables inventory drop">
+                    <div class="card-header">
+                        <span class="guide-icon">🎒</span>
+                        <div class="guide-title">
+                            <h3>Collectables</h3>
+                            <p>Rarity & Crafting</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/inventory</div>
+                        <ul class="detail-list">
+                            <li>Flash Drops: Click to claim.</li>
+                            <li><strong>Master Key:</strong> Crafted from 9 Frags.</li>
+                            <li>Chests: Contains Legendary items.</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            
-            <div id="no-results" style="text-align: center; margin-top: 50px; display: none; color: var(--text-muted);">
-                <h3>No protocols found matching that query.</h3>
+
             </div>
         </div>
     </section>
 
     <section id="legal" class="page-section">
         <div class="legal-wrapper">
-            <div class="legal-card">
+            
+            <div id="tos" class="legal-card">
                 <h2>Terms of Service</h2>
                 <div class="legal-block">
                     <h3>1. Usage Agreement</h3>
-                    <p>By using Trivia Bot, you agree to these terms. Features like "Risky Duels" involve the loss of virtual currency. Refund requests for gameplay mechanics are automatically rejected.</p>
+                    <p>By using Trivia Bot, you agree that virtual assets (Credits) have no real-world value. Refund requests for gameplay mechanics (theft, raids) are rejected.</p>
                 </div>
                 <div class="legal-block">
                     <h3>2. Prohibited Conduct</h3>
                     <ul>
-                        <li><span class="warning">Automation:</span> Use of self-bots or scripts is banned.</li>
-                        <li><span class="warning">Alting:</span> Using multiple accounts to farm drops results in a data wipe.</li>
-                        <li><span class="warning">Exploits:</span> Abusing bugs (e.g., infinite money glitches) leads to a ban.</li>
+                        <li><span class="warning">Automation:</span> Self-bots/macros are banned.</li>
+                        <li><span class="warning">Alting:</span> Multiple accounts for farming = Ban.</li>
+                        <li><span class="warning">Exploits:</span> Reporting bugs is mandatory.</li>
                     </ul>
-                </div>
-                <div class="legal-block">
-                    <h3>3. Disclaimer</h3>
-                    <p>We are not affiliated with Discord Inc. "Credits" have no real-world monetary value.</p>
                 </div>
             </div>
 
-            <div class="legal-card">
-                <h2 style="border-bottom-color: var(--pink);">Privacy Policy</h2>
+            <div id="privacy" class="legal-card">
+                <h2>Privacy Policy</h2>
                 <div class="legal-block">
                     <h3>1. Data Collection</h3>
-                    <p>We store the following Discord data to facilitate gameplay:</p>
-                    <ul>
-                        <li>User IDs (for inventory/economy tracking).</li>
-                        <li>Guild IDs (for configuration settings).</li>
-                        <li>Game History (Duel records, Rank stats).</li>
-                    </ul>
+                    <p>We store: Discord User IDs (Inventory), Guild IDs (Config), and Game History (Stats).</p>
                 </div>
                 <div class="legal-block">
-                    <h3>2. Data Security</h3>
-                    <p>Data is stored in a secured MongoDB Atlas cluster. We do not sell user data. You may request a full account deletion by contacting support.</p>
+                    <h3>2. Data Rights</h3>
+                    <p>Data is stored in encrypted MongoDB Atlas. Request deletion via Support Server.</p>
                 </div>
                 <div class="legal-block">
                     <h3>3. Contact</h3>
-                    <p>For support or ban appeals, contact Developer ID: <span class="highlight">755031448318246913</span>.</p>
+                    <p>Developer ID: <span class="highlight">755031448318246913</span></p>
                 </div>
             </div>
+
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2025 Trivia Bot Protocol. All Systems Nominal.<br>Interface designed with Cyber-Standards.</p>
+        <p>&copy; 2025 Trivia Bot Protocol. <br>System Status: Nominal</p>
     </footer>
 
     <script>
-        // --- 1. AUDIO ENGINE (FIXED FOR MOBILE) ---
+        // --- 1. AUDIO ENGINE ---
         class AmbientSystem {
-            constructor() {
-                this.ctx = null;
-                this.gainNode = null;
-            }
-
+            constructor() { this.ctx = null; this.gainNode = null; }
             init() {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 this.ctx = new AudioContext();
                 this.gainNode = this.ctx.createGain();
                 this.gainNode.connect(this.ctx.destination);
                 this.gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
-                
-                // LAYER 1: Deep Sub-Bass (55Hz/57Hz) - For Desktops/Subs
-                this.createOsc(55, 0.6);
-                this.createOsc(57, 0.6);
-
-                // LAYER 2: Audible Low-Mid (110Hz/114Hz) - FOR MOBILE/LAPTOPS
-                // This ensures sound is heard even on small speakers
-                this.createOsc(110, 0.3); 
-                this.createOsc(114, 0.3);
+                // Low-Mid Frequencies for Mobile/Desktop capability
+                this.createOsc(110, 0.3); this.createOsc(114, 0.3);
             }
-
-            createOsc(freq, relativeVol) {
+            createOsc(freq, vol) {
                 const osc = this.ctx.createOscillator();
-                const localGain = this.ctx.createGain();
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                
-                localGain.gain.value = relativeVol; // Balance between layers
-                osc.connect(localGain);
-                localGain.connect(this.gainNode);
-                
-                osc.start();
+                const g = this.ctx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                g.gain.value = vol; osc.connect(g); g.connect(this.gainNode); osc.start();
             }
-
-            fadeIn() {
-                if (!this.ctx) return;
-                // Fade to 5% global volume (Keeps it subtle but audible)
-                this.gainNode.gain.setTargetAtTime(0.05, this.ctx.currentTime, 2); 
-            }
-
-            fadeOut() {
-                if (!this.ctx) return;
-                this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5); 
-            }
+            fadeIn() { if(this.ctx) this.gainNode.gain.setTargetAtTime(0.05, this.ctx.currentTime, 2); }
+            fadeOut() { if(this.ctx) this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5); }
         }
-
         const audioSys = new AmbientSystem();
+        let soundEnabled = false;
 
-        // --- 2. SYSTEM START ---
         function initializeSystem() {
-            const overlay = document.getElementById('startup-overlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => { overlay.style.display = 'none'; }, 800);
-            
-            // Audio requires user interaction first
-            audioSys.init();
-            audioSys.fadeIn();
+            document.getElementById('startup-overlay').style.display = 'none';
+            toggleSound();
         }
 
-        // --- 3. NAV LOGIC ---
-        function handleNavClick(targetId) {
-            const tabMap = { 'home': 'nav-home', 'guide': 'nav-guide', 'legal': 'nav-legal' };
+        function toggleSound() {
+            const btn = document.getElementById('sound-btn');
+            if(!soundEnabled) {
+                if(!audioSys.ctx) audioSys.init();
+                audioSys.ctx.resume().then(() => {
+                    audioSys.fadeIn();
+                    soundEnabled = true;
+                    btn.classList.add('active');
+                });
+            } else {
+                audioSys.fadeOut();
+                soundEnabled = false;
+                btn.classList.remove('active');
+            }
+        }
 
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        // --- 2. DEEP LINKING & NAVIGATION ---
+        function handleNavClick(targetId) {
+            const map = { 'home': 'nav-home', 'guide': 'nav-guide', 'legal': 'nav-legal' };
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn:not(#sound-btn)').forEach(b => b.classList.remove('active'));
 
             const section = document.getElementById(targetId);
-            const btn = document.getElementById(tabMap[targetId]);
+            const btn = document.getElementById(map[targetId]);
+            if(section) section.classList.add('active');
+            if(btn) btn.classList.add('active');
 
-            if (section) section.classList.add('active');
-            if (btn) btn.classList.add('active');
-
+            // Ambiance Control
             const canvas = document.getElementById('canvas-container');
-            if (targetId === 'legal') {
-                audioSys.fadeOut();
-                canvas.style.opacity = '0';
-            } else {
-                audioSys.fadeIn();
-                canvas.style.opacity = targetId === 'home' ? '1' : '0.3';
-            }
-            
-            // Scroll to top on tab switch
+            if(targetId === 'home') canvas.style.opacity = '0.6';
+            else if(targetId === 'legal') canvas.style.opacity = '0'; 
+            else canvas.style.opacity = '0.2';
+
             window.scrollTo(0,0);
         }
 
-        // --- 4. SEARCH ---
-        function filterGuide() {
-            const input = document.getElementById('guideSearch').value.toLowerCase();
-            const cards = document.querySelectorAll('.guide-card');
-            let visibleCount = 0;
-
-            cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                const keywords = card.getAttribute('data-keywords');
-                if (text.includes(input) || keywords.includes(input)) {
-                    card.style.display = 'block';
-                    visibleCount++;
-                } else { card.style.display = 'none'; }
+        // --- 3. ACCORDION LOGIC ---
+        function toggleDetails(btn) {
+            const card = btn.parentElement;
+            const wasExpanded = card.classList.contains('expanded');
+            
+            // Close all others (optional - keeps UI cleaner)
+            document.querySelectorAll('.guide-card').forEach(c => {
+                c.classList.remove('expanded');
+                c.querySelector('.expand-btn').innerText = '▼ Access Data';
             });
-            document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
+
+            if(!wasExpanded) {
+                card.classList.add('expanded');
+                btn.innerText = '▲ Close Data';
+            }
         }
 
-        // --- 5. 3D BACKGROUND ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        function filterGuide() {
+            const input = document.getElementById('guideSearch').value.toLowerCase();
+            document.querySelectorAll('.guide-card').forEach(card => {
+                const text = card.innerText.toLowerCase();
+                const tags = card.getAttribute('data-keywords');
+                card.style.display = (text.includes(input) || tags.includes(input)) ? 'flex' : 'none';
+            });
+        }
 
-        const geometry = new THREE.IcosahedronGeometry(10, 2);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.15 });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
-
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 600; // Reduced slightly for mobile performance
-        const posArray = new Float32Array(particlesCount * 3);
-        for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 40; }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({ size: 0.05, color: 0xff0096, transparent: true, opacity: 0.8 });
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        camera.position.z = 25;
-        let mouseX = 0, mouseY = 0;
-
-        // Touch support for parallax
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX / window.innerWidth - 0.5;
-            mouseY = e.clientY / window.innerHeight - 0.5;
-        });
-        document.addEventListener('touchmove', (e) => {
-            if(e.touches.length > 0) {
-                mouseX = e.touches[0].clientX / window.innerWidth - 0.5;
-                mouseY = e.touches[0].clientY / window.innerHeight - 0.5;
+        // --- 4. STARTUP LOGIC ---
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.substring(1);
+            if(hash) {
+                // SKIP OVERLAY for deep links
+                document.getElementById('startup-overlay').style.display = 'none';
+                
+                if(hash === 'tos' || hash === 'privacy') {
+                    handleNavClick('legal');
+                    setTimeout(() => {
+                        const el = document.getElementById(hash);
+                        if(el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+                    }, 100);
+                } else if(hash === 'guide') {
+                    handleNavClick('guide');
+                }
             }
         });
 
+        // --- 5. THREE.JS ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const geo = new THREE.IcosahedronGeometry(10, 2);
+        const mat = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.1 });
+        const sphere = new THREE.Mesh(geo, mat);
+        scene.add(sphere);
+
+        const pGeo = new THREE.BufferGeometry();
+        const pCount = 500;
+        const pArr = new Float32Array(pCount * 3);
+        for(let i=0; i<pCount*3; i++) pArr[i] = (Math.random()-0.5)*40;
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
+        const pMat = new THREE.PointsMaterial({ size: 0.05, color: 0xff0096, transparent: true, opacity: 0.6 });
+        const pMesh = new THREE.Points(pGeo, pMat);
+        scene.add(pMesh);
+
+        camera.position.z = 25;
+        let mx = 0, my = 0;
+        document.addEventListener('mousemove', e => { mx = e.clientX/window.innerWidth-0.5; my = e.clientY/window.innerHeight-0.5; });
+
         function animate() {
             requestAnimationFrame(animate);
-            sphere.rotation.y += 0.002;
-            sphere.rotation.x += 0.001;
-            particlesMesh.rotation.y -= 0.003;
-            sphere.rotation.y += mouseX * 0.05;
-            sphere.rotation.x += mouseY * 0.05;
+            sphere.rotation.y += 0.002; sphere.rotation.x += 0.001;
+            pMesh.rotation.y -= 0.002;
+            sphere.rotation.y += mx*0.05; sphere.rotation.x += my*0.05;
             renderer.render(scene, camera);
         }
         animate();
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.aspect = window.innerWidth/window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
