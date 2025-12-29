@@ -4,45 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Trivia Bot | The Protocol</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@600;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
 
     <style>
         :root {
-            --bg-deep: #050011;
+            --bg-void: #06000c;
             --neon-pink: #ff0055;
-            --neon-purple: #bd00ff;
-            --neon-cyan: #00f3ff;
-            --sun-yellow: #ffd700;
-            --sun-orange: #ff4800;
+            --neon-purple: #bc13fe;
+            --neon-blue: #00f3ff;
+            --sun-top: #ffea00;
+            --sun-bot: #ff0055;
             
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #ffffff;
-            --text-muted: #a0a0c0;
-            
-            --glow-pink: 0 0 20px rgba(255, 0, 85, 0.5);
-            --glow-cyan: 0 0 20px rgba(0, 243, 255, 0.5);
+            --glass: rgba(10, 10, 20, 0.6);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: #a8a8b8;
+            --discord: #5865F2;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Inter', sans-serif;
-            color: var(--text-main);
-            background-color: var(--bg-deep);
+            color: var(--text);
+            background-color: var(--bg-void);
             overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* --- VINTAGE OVERLAY --- */
+        /* --- CRT OVERLAY --- */
         body::after {
             content: " ";
             display: block;
             position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
+                radial-gradient(circle at center, transparent 60%, #000 100%);
+            background-size: 100% 3px, 100% 100%;
             z-index: 9999;
             pointer-events: none;
         }
@@ -55,168 +55,181 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 10000;
             display: flex; justify-content: center; align-items: center; flex-direction: column;
-            transition: opacity 1s ease; cursor: pointer; padding: 20px; text-align: center;
+            transition: opacity 0.8s ease; cursor: pointer; padding: 20px; text-align: center;
         }
         #startup-overlay h1 {
-            font-family: 'Orbitron'; font-size: clamp(2rem, 6vw, 4rem);
-            background: linear-gradient(to bottom, var(--sun-yellow), var(--sun-orange));
+            font-family: 'Orbitron'; font-size: clamp(2rem, 5vw, 4rem);
+            background: linear-gradient(to bottom, var(--sun-top), var(--sun-bot));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px var(--sun-orange);
+            text-shadow: 0 0 40px var(--sun-bot);
             margin-bottom: 20px; letter-spacing: 4px;
         }
-        #startup-overlay p { color: var(--neon-cyan); font-family: 'JetBrains Mono'; animation: pulse 1.5s infinite; letter-spacing: 2px; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        #startup-overlay p { color: var(--neon-blue); font-family: 'JetBrains Mono'; animation: blink 1s infinite; letter-spacing: 2px; font-size: 0.9rem; }
+        @keyframes blink { 50% { opacity: 0; } }
 
-        /* --- NAVIGATION (Glassium) --- */
+        /* --- NAVIGATION --- */
         nav {
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; display: flex; gap: 15px;
-            background: rgba(20, 20, 40, 0.4);
-            padding: 10px 15px; border-radius: 50px;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: max-content; max-width: 90%;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; display: flex; align-items: center; gap: 8px;
+            background: rgba(5, 0, 15, 0.7);
+            padding: 6px 10px; border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            width: max-content; max-width: 95%;
         }
         
         .nav-btn {
-            background: transparent; border: none; color: rgba(255,255,255,0.6);
-            padding: 10px 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+            background: transparent; border: none; color: var(--text-dim);
+            padding: 8px 18px; font-weight: 600; font-size: 0.8rem; cursor: pointer;
             transition: all 0.3s ease; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
             border-radius: 30px; text-transform: uppercase;
         }
-        .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-btn:hover { color: #fff; text-shadow: 0 0 5px #fff; }
         .nav-btn.active { 
-            color: var(--bg-deep); 
-            background: var(--neon-cyan); 
-            box-shadow: 0 0 15px var(--neon-cyan);
-            font-weight: 800;
+            color: #000; background: var(--neon-blue); 
+            box-shadow: 0 0 15px var(--neon-blue); 
+            text-shadow: none; font-weight: 800;
         }
 
         .sound-toggle {
+            width: 36px; height: 36px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-            cursor: pointer; transition: 0.3s;
+            border: 1px solid var(--border); margin-left: 5px; cursor: pointer;
+            transition: 0.3s;
         }
-        .sound-toggle svg { width: 18px; fill: #fff; opacity: 0.5; }
+        .sound-toggle svg { width: 16px; fill: var(--text-dim); }
         .sound-toggle.active { border-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
-        .sound-toggle.active svg { fill: var(--neon-pink); opacity: 1; }
+        .sound-toggle.active svg { fill: var(--neon-pink); }
 
         /* --- SECTIONS --- */
-        .page-section { display: none; min-height: 100vh; padding: 140px 20px 80px; opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .page-section { display: none; min-height: 100vh; padding: 120px 20px 80px; opacity: 0; transform: translateY(20px); transition: all 0.6s ease; }
         .page-section.active { display: block; opacity: 1; transform: translateY(0); }
 
         /* --- HERO --- */
-        #home { display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100vh; padding-top: 0; }
+        #home { 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            height: 100vh; 
+            padding-top: 15vh;
+        }
         #home.active { display: flex; }
         
         .hero-title {
-            font-family: 'Orbitron'; font-size: clamp(3rem, 12vw, 7rem); font-weight: 900; line-height: 1;
-            color: #fff; text-shadow: 0 0 40px rgba(255, 0, 85, 0.6);
-            margin-bottom: 20px; letter-spacing: -2px; mix-blend-mode: screen;
-            transform: skewX(-5deg);
+            font-family: 'Orbitron'; font-size: clamp(2.5rem, 8vw, 5.5rem); font-weight: 900; line-height: 1.1;
+            color: #fff; text-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
+            margin-bottom: 15px; letter-spacing: -2px; 
+            text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-blue);
         }
         
         .hero-subtitle {
-            font-size: clamp(0.9rem, 3vw, 1.2rem); color: var(--neon-cyan);
-            text-transform: uppercase; letter-spacing: 6px; margin-bottom: 50px;
-            text-shadow: 0 0 20px var(--neon-cyan); font-weight: 700;
+            font-size: clamp(0.8rem, 2.5vw, 1.1rem); color: var(--neon-blue);
+            text-transform: uppercase; letter-spacing: 6px; margin-bottom: 40px;
+            text-shadow: 0 0 15px var(--neon-blue); font-weight: 700;
         }
         
-        /* Glassium Buttons */
-        .cta-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .cta-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         
-        .btn-glass {
-            position: relative; padding: 18px 45px;
+        .btn-retro {
+            position: relative; padding: 16px 40px;
             font-family: 'Orbitron'; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
             color: #fff; text-decoration: none; cursor: pointer;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(4px);
+            transition: 0.3s;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            display: flex; align-items: center; gap: 10px;
         }
+        .btn-retro:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); }
         
-        .btn-glass::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .btn-glass:hover {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
-            transform: translateY(-3px);
-            text-shadow: 0 0 10px rgba(255,255,255,0.8);
-        }
-        .btn-glass:hover::before { left: 100%; }
+        .btn-retro svg { width: 20px; height: 20px; fill: currentColor; }
 
-        .btn-glass.secondary:hover { border-color: var(--neon-cyan); box-shadow: 0 0 30px rgba(0, 243, 255, 0.4); }
+        .btn-retro.secondary { border-color: var(--neon-pink); background: rgba(255, 0, 85, 0.05); color: var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 85, 0.2); }
+        .btn-retro.secondary:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 30px var(--neon-pink); }
 
-        /* --- CARDS (Wiki/Legal) --- */
-        .docs-container { max-width: 1200px; margin: 0 auto; }
-        .docs-header h1 { text-align: center; font-family: 'Orbitron'; font-size: 2.5rem; margin-bottom: 40px; color: #fff; text-shadow: 0 0 20px var(--neon-cyan); }
+        /* --- DATABASE CARDS --- */
+        .docs-container { max-width: 1100px; margin: 0 auto; }
+        .docs-header h1 { text-align: center; font-family: 'Orbitron'; font-size: 2.5rem; margin-bottom: 40px; color: #fff; text-shadow: 0 0 20px var(--neon-purple); }
         
         .search-bar {
             width: 100%; max-width: 600px; margin: 0 auto 50px; display: block;
-            padding: 18px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
-            border-radius: 12px; color: #fff; font-family: 'JetBrains Mono';
-            backdrop-filter: blur(10px); transition: 0.3s;
+            padding: 16px; background: rgba(0,0,0,0.6); border: 1px solid var(--border);
+            color: #fff; font-family: 'JetBrains Mono'; backdrop-filter: blur(10px); transition: 0.3s;
         }
-        .search-bar:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); }
+        .search-bar:focus { outline: none; border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
 
         .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
         
         .guide-card {
-            background: rgba(20, 20, 30, 0.6);
-            border: 1px solid var(--glass-border); border-radius: 16px;
-            padding: 30px; position: relative; overflow: hidden; transition: all 0.4s ease;
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            background: linear-gradient(180deg, rgba(20,20,30,0.8) 0%, rgba(10,10,20,0.9) 100%);
+            border: 1px solid var(--border); padding: 30px; 
+            position: relative; overflow: hidden; transition: all 0.3s ease;
         }
-        .guide-card:hover { transform: translateY(-5px); border-color: var(--neon-cyan); box-shadow: 0 10px 40px rgba(0, 243, 255, 0.15); }
-        
-        .guide-card.risk:hover { border-color: var(--neon-pink); box-shadow: 0 10px 40px rgba(255, 0, 85, 0.15); }
+        .guide-card:hover { transform: translateY(-5px); border-color: var(--neon-blue); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1); }
+        .guide-card.risk:hover { border-color: var(--neon-pink); box-shadow: 0 10px 30px rgba(255, 0, 85, 0.1); }
 
-        .card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .guide-icon { font-size: 2rem; }
-        .guide-title h3 { font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; margin-bottom: 5px; }
-        .guide-title p { color: var(--text-muted); font-size: 0.85rem; }
+        .card-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
+        .guide-icon { font-size: 2rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .guide-title h3 { font-family: 'Orbitron'; font-size: 1.3rem; color: #fff; margin-bottom: 5px; }
+        .guide-title p { color: var(--text-dim); font-size: 0.9rem; }
         
         .expand-btn {
-            background: rgba(255,255,255,0.05); border: none; color: var(--neon-cyan);
-            width: 100%; padding: 12px; border-radius: 8px; font-family: 'JetBrains Mono'; 
-            text-transform: uppercase; cursor: pointer; transition: 0.2s; margin-top: 15px; font-size: 0.8rem;
+            background: rgba(255,255,255,0.05); border: none; color: var(--neon-blue);
+            width: 100%; padding: 12px; font-family: 'JetBrains Mono'; text-transform: uppercase;
+            cursor: pointer; transition: 0.2s; margin-top: auto; font-size: 0.75rem; letter-spacing: 1px;
         }
         .expand-btn:hover { background: rgba(0, 243, 255, 0.1); color: #fff; }
 
-        .details-panel { max-height: 0; overflow: hidden; transition: all 0.5s ease; opacity: 0; }
-        .guide-card.expanded .details-panel { max-height: 800px; opacity: 1; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
-        
-        .code-snippet { background: #000; color: var(--neon-pink); padding: 5px 10px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 0.8rem; border: 1px solid rgba(255,0,85,0.3); display: inline-block; margin-bottom: 10px; }
-        
-        /* LEGAL SECTION */
-        .legal-wrapper { max-width: 900px; margin: 0 auto; }
-        .legal-block { 
-            background: rgba(10, 10, 15, 0.8); border: 1px solid var(--glass-border); 
-            border-radius: 20px; padding: 40px; margin-bottom: 40px;
-            backdrop-filter: blur(20px);
+        .details-panel { 
+            max-height: 0; overflow: hidden; transition: all 0.5s ease; opacity: 0; 
+            border-top: 1px solid transparent;
         }
-        .legal-block h2 { font-family: 'Orbitron'; color: #fff; border-bottom: 2px solid var(--neon-pink); padding-bottom: 15px; margin-bottom: 30px; font-size: 2rem; }
-        .legal-block h3 { color: var(--neon-cyan); font-family: 'Orbitron'; margin: 30px 0 15px; font-size: 1.2rem; }
-        .legal-block p, li { color: var(--text-muted); line-height: 1.8; margin-bottom: 15px; font-size: 1rem; }
+        .guide-card.expanded .details-panel { 
+            max-height: 800px; opacity: 1; margin-top: 20px; padding-top: 20px; 
+            border-top: 1px dashed rgba(255,255,255,0.1); 
+        }
+        
+        .code-snippet { background: #000; color: var(--neon-pink); padding: 4px 8px; font-family: 'JetBrains Mono'; font-size: 0.8rem; border: 1px solid var(--neon-pink); display: inline-block; margin-bottom: 8px; }
+        
+        .detail-list { list-style: none; color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; }
+        .detail-list li { margin-bottom: 10px; display: flex; gap: 10px; }
+        .detail-list li::before { content: '>'; color: var(--neon-blue); font-weight: bold; }
+        .detail-list strong { color: #fff; }
+
+        /* --- COMMANDS TABLE SECTION --- */
+        .commands-section { margin-top: 80px; }
+        .cmd-table-wrapper { overflow-x: auto; border: 1px solid var(--border); background: rgba(10, 10, 20, 0.6); }
+        .cmd-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono'; font-size: 0.9rem; min-width: 600px; }
+        .cmd-table th { text-align: left; padding: 15px; border-bottom: 1px solid var(--neon-blue); color: var(--neon-blue); text-transform: uppercase; }
+        .cmd-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-dim); }
+        .cmd-table tr:hover td { background: rgba(0, 243, 255, 0.05); color: #fff; }
+        .cmd-pill { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; color: #fff; }
+
+        /* LEGAL */
+        .legal-wrapper { max-width: 800px; margin: 0 auto; }
+        .legal-block { 
+            background: rgba(10, 10, 15, 0.85); border: 1px solid var(--border); 
+            padding: 40px; margin-bottom: 40px; backdrop-filter: blur(20px);
+        }
+        .legal-block h2 { font-family: 'Orbitron'; color: #fff; border-bottom: 2px solid var(--neon-purple); padding-bottom: 15px; margin-bottom: 25px; font-size: 1.8rem; }
+        .legal-block h3 { color: var(--neon-blue); font-family: 'Orbitron'; margin: 25px 0 10px; font-size: 1.1rem; }
+        .legal-block p, .legal-block li { color: var(--text-dim); line-height: 1.7; margin-bottom: 15px; font-size: 0.95rem; }
+        .legal-block ul { margin-left: 20px; }
         .legal-block strong { color: #fff; }
 
-        footer { text-align: center; padding: 50px; color: rgba(255,255,255,0.3); font-size: 0.8rem; font-family: 'JetBrains Mono'; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 10; background: #050011; }
+        footer { text-align: center; padding: 40px; color: rgba(255,255,255,0.3); font-size: 0.8rem; font-family: 'JetBrains Mono'; border-top: 1px solid rgba(255,255,255,0.05); background: #000; position: relative; z-index: 10; }
 
         @media (max-width: 768px) {
-            .hero-title { font-size: 15vw; }
+            .hero-title { font-size: 13vw; padding: 0 10px; }
             .guide-grid { grid-template-columns: 1fr; }
-            .cta-group { flex-direction: column; width: 100%; }
-            .btn-glass { width: 100%; justify-content: center; }
-            nav { width: 95%; flex-wrap: wrap; justify-content: center; top: 15px; }
+            .cta-group { flex-direction: column; width: 100%; padding: 0 20px; }
+            .btn-retro { width: 100%; justify-content: center; }
+            nav { width: 95%; padding: 8px; gap: 5px; }
+            .nav-btn { padding: 8px 12px; font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -226,7 +239,7 @@
 
     <div id="startup-overlay" onclick="initializeSystem()">
         <h1>SYSTEM READY</h1>
-        <p>[ TAP TO INITIALIZE PROTOCOL ]</p>
+        <p>[ TAP TO INITIALIZE ]</p>
     </div>
 
     <nav>
@@ -243,10 +256,13 @@
         <div class="hero-subtitle">Infinite Knowledge Engine</div>
         
         <div class="cta-group">
-            <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="btn-glass">
+            <a href="https://discord.gg/ZjJMn8KeZs" target="_blank" class="btn-retro">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.419-2.1568 2.419z"/>
+                </svg>
                 Support Server
             </a>
-            <button onclick="handleNavClick('guide')" class="btn-glass secondary">Access Database</button>
+            <button onclick="handleNavClick('guide')" class="btn-retro secondary">Access Database</button>
         </div>
     </section>
 
@@ -258,6 +274,7 @@
             <input type="text" id="guideSearch" class="search-bar" placeholder="SEARCH QUERY..." onkeyup="filterGuide()">
 
             <div class="guide-grid">
+                
                 <div class="guide-card" data-keywords="trivia core start loop">
                     <div class="card-header">
                         <span class="guide-icon">🧠</span>
@@ -268,8 +285,13 @@
                     </div>
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
-                        <div class="code-snippet">/start [channel]</div>
-                        <p style="color:#aaa;">Timer: 20 Minutes • Points: 100-500 • Global Cooldown: 15m</p>
+                        <div class="code-snippet">/start [channel]</div> <div class="code-snippet">/category [topic]</div>
+                        <ul class="detail-list">
+                            <li><strong>Timer:</strong> Questions drop automatically every <strong>20 Minutes</strong>.</li>
+                            <li><strong>Points:</strong> 100 (Easy), 250 (Medium), 500 (Hard).</li>
+                            <li><strong>Cooldown:</strong> 15 Minutes global cooldown between servers.</li>
+                            <li><strong>Streaks:</strong> Wrong answer resets streak to 0 (unless Backup Drive is used).</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -277,14 +299,19 @@
                     <div class="card-header">
                         <span class="guide-icon">💳</span>
                         <div class="guide-title">
-                            <h3>Economy</h3>
+                            <h3>Economy & Items</h3>
                             <p>Credits & Trade</p>
                         </div>
                     </div>
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
-                        <div class="code-snippet">/shop</div>
-                        <p style="color:#aaa;">Buy Shield, Hint, Backup. Trade rare items on the Marketplace.</p>
+                        <div class="code-snippet">/shop</div> <div class="code-snippet">/marketplace</div>
+                        <ul class="detail-list">
+                            <li><strong>Shield (200 CR):</strong> Blocks 1 credit theft in Risky Duels (Auto-use).</li>
+                            <li><strong>Decryptor (150 CR):</strong> Removes 2 wrong answers (Hint).</li>
+                            <li><strong>Backup (500 CR):</strong> Prevents streak reset.</li>
+                            <li><strong>Auctions:</strong> Bids in the last 60s extend time by 2 mins (Snipe Protection).</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -299,11 +326,16 @@
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
                         <div class="code-snippet">/duel [user] Risky</div>
-                        <p style="color:#aaa;">Fee: 50 CR. Theft: 30% of loser's wallet on 5-0 win.</p>
+                        <ul class="detail-list">
+                            <li><strong>Fee:</strong> 50 Credits to enter.</li>
+                            <li><strong>Cooldown:</strong> 20 Hours between Risky Duels.</li>
+                            <li><strong>Theft:</strong> Winning 5-0 steals <strong>30%</strong> of loser's wallet (if no Shield).</li>
+                            <li><strong>Draws:</strong> All bets are fully refunded.</li>
+                        </ul>
                     </div>
                 </div>
 
-                <div class="guide-card" data-keywords="raid boss">
+                <div class="guide-card raid" data-keywords="raid boss">
                     <div class="card-header">
                         <span class="guide-icon">👹</span>
                         <div class="guide-title">
@@ -313,148 +345,268 @@
                     </div>
                     <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
                     <div class="details-panel">
-                        <div class="code-snippet">/raid_start</div>
-                        <p style="color:#aaa;">DMG: 500 per hit. Loot based on DMG dealt.</p>
+                        <div class="code-snippet">/raid_start [name]</div>
+                        <ul class="detail-list">
+                            <li><strong>Combat:</strong> Rapid-fire questions every 20 seconds.</li>
+                            <li><strong>Damage:</strong> Correct answer = <strong>500 Damage</strong>.</li>
+                            <li><strong>Healing:</strong> Incorrect answer heals Boss for 50 HP.</li>
+                            <li><strong>Loot:</strong> Credits = (Damage / 500) * 100. Killer gets +3000 CR bonus.</li>
+                        </ul>
                     </div>
                 </div>
+
+                <div class="guide-card" data-keywords="faction team war">
+                    <div class="card-header">
+                        <span class="guide-icon">🚩</span>
+                        <div class="guide-title">
+                            <h3>Factions</h3>
+                            <p>Weekly Warfare</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/faction_create</div>
+                        <ul class="detail-list">
+                            <li><strong>Cost:</strong> 10,000 Credits to found a faction.</li>
+                            <li><strong>Goal:</strong> Highest collective correct answer count.</li>
+                            <li><strong>Rewards:</strong> Leader: 5k CR + 5 Master Keys. Members: 1k CR + 1 Master Key.</li>
+                            <li><strong>Icons:</strong> Custom icons require Dev approval unless user is "Trusted".</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guide-card" data-keywords="collectables inventory drop">
+                    <div class="card-header">
+                        <span class="guide-icon">🎒</span>
+                        <div class="guide-title">
+                            <h3>Collectables</h3>
+                            <p>Rarity & Crafting</p>
+                        </div>
+                    </div>
+                    <button class="expand-btn" onclick="toggleDetails(this)">▼ Access Data</button>
+                    <div class="details-panel">
+                        <div class="code-snippet">/inventory</div> <div class="code-snippet">/craft</div>
+                        <ul class="detail-list">
+                            <li><strong>Flash Drops:</strong> Spawn randomly in active channels (30% chance). First click claims.</li>
+                            <li><strong>Master Key:</strong> Crafted from 9 Key Fragments.</li>
+                            <li><strong>Chests:</strong> Require Master Key. Drop chances: 30% Powerup, 70% Collectable.</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
+
+            <div class="commands-section">
+                <h2 style="color:#fff; font-family:'Orbitron'; text-align:center; margin-bottom:30px; letter-spacing:2px; margin-top: 80px;">SLASH COMMAND REFERENCE</h2>
+                <div class="cmd-table-wrapper">
+                    <table class="cmd-table">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="cmd-pill">/play</span></td>
+                                <td>Core</td>
+                                <td>View how to play and rules.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/profile</span></td>
+                                <td>Stats</td>
+                                <td>View detailed agent statistics & badges.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/rank</span></td>
+                                <td>Stats</td>
+                                <td>Generate a visual Server Rank Card.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/shop</span></td>
+                                <td>Economy</td>
+                                <td>Buy powerups and custom server roles.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/inventory</span></td>
+                                <td>Economy</td>
+                                <td>Check your items and key fragments.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/marketplace</span></td>
+                                <td>Economy</td>
+                                <td>Buy/Sell items on the global user market.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/auction_start</span></td>
+                                <td>Economy</td>
+                                <td>Start a bidding war for an item.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/duel</span></td>
+                                <td>PvP</td>
+                                <td>Challenge a user. Modes: Normal or Risky.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/faction_create</span></td>
+                                <td>Social</td>
+                                <td>Create a new Faction (Cost: 10k).</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/faction_join</span></td>
+                                <td>Social</td>
+                                <td>Request to join an existing faction.</td>
+                            </tr>
+                             <tr>
+                                <td><span class="cmd-pill">/faction_manage</span></td>
+                                <td>Social</td>
+                                <td>Manage members/invites (Leaders/Mods).</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/pay</span></td>
+                                <td>Economy</td>
+                                <td>Transfer credits to another user (5% Tax).</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/trade</span></td>
+                                <td>Economy</td>
+                                <td>Directly offer an item to a user.</td>
+                            </tr>
+                             <tr>
+                                <td><span class="cmd-pill">/craft</span></td>
+                                <td>Items</td>
+                                <td>Combine 9 Fragments into a Master Key.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="cmd-pill">/chest</span></td>
+                                <td>Items</td>
+                                <td>Open a Loot Chest (Requires Master Key).</td>
+                            </tr>
+                             <tr>
+                                <td><span class="cmd-pill">/memory</span></td>
+                                <td>Mini-game</td>
+                                <td>Launch the Memory Game activity.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <section id="legal" class="page-section">
         <div class="legal-wrapper">
+            
             <div id="tos" class="legal-block">
                 <h2>Terms of Service</h2>
-                <p><strong>Effective Date:</strong> December 2025</p>
-                <h3>1. Agreement</h3>
-                <p>By using Trivia Bot, you agree to these terms. Misuse results in permanent bans.</p>
-                <h3>2. Fair Play</h3>
-                <p>Automation, macros, and alt-farming are strictly prohibited.</p>
-                <h3>3. Virtual Assets</h3>
-                <p>Credits have no real-world monetary value.</p>
+                <p><strong>Last Edited:</strong> December 2025</p>
+
+                <h3>1. Agreement to Terms</h3>
+                <p>By inviting or interacting with Trivia Bot ("the Service"), you agree to be bound by these Terms. If you do not agree, you must remove the bot from your server and cease use immediately.</p>
+
+                <h3>2. Usage & Conduct</h3>
+                <ul>
+                    <li><strong>Fair Play:</strong> Users are prohibited from using self-bots, macros, or scripts to automate gameplay. Usage of multiple accounts ("alts") to farm credits or manipulate leaderboards is strictly forbidden.</li>
+                    <li><strong>No Exploits:</strong> Intentionally abusing bugs for economic gain will result in an immediate ban and data wipe.</li>
+                    <li><strong>Respect:</strong> You may not use the Service to generate harassment, hate speech, or illegal content via custom inputs (e.g., Boss Raid Naming).</li>
+                </ul>
+
+                <h3>3. Rights We Reserve</h3>
+                <p>To ensure the best experience for all users, we reserve the following rights:</p>
+                <ul>
+                    <li><strong>Modification:</strong> We may update, change, or discontinue any aspect of the Service (including features and economy balance) at any time without prior notice.</li>
+                    <li><strong>Service Termination:</strong> We reserve the right to permanently or temporarily terminate the Service for any reason.</li>
+                </ul>
+
+                <h3>4. Virtual Currency & RMT</h3>
+                <p>The "Credits" and items within the Service are virtual game assets with <strong>no real-world monetary value</strong>. Real Money Trading (RMT), including selling credits, items, or accounts for real currency or external value (e.g., Discord Nitro), is strictly prohibited and will result in a permanent ban.</p>
             </div>
             
             <div id="privacy" class="legal-block">
-                <h2 style="border-color: var(--neon-cyan);">Privacy Policy</h2>
+                <h2 style="border-color: var(--neon-pink);">Privacy Policy</h2>
                 
-                <h3>1. Data Collection</h3>
-                <p>We collect User IDs (Inventory), Guild IDs (Config), and Gameplay Statistics.</p>
-                
-                <h3>2. Seasonal Wipes & Data Retention</h3>
-                <p>To ensure fair competition and system health, we enforce <strong>Seasonal Resets</strong>. The data handling policy during a reset is as follows:</p>
+                <h3>1. Information We Collect</h3>
+                <p>We collect only the minimum data necessary to provide gameplay features:</p>
                 <ul>
-                    <li><strong>Deleted Data (The Wipe):</strong> All <strong>Economy Data</strong> is permanently deleted. This includes Credits, Inventory Items, Badges, Duel Records, Market Listings, and Active Auctions.</li>
-                    <li><strong>Retained Data (Security):</strong> Your <strong>User ID</strong> and <strong>Ban History</strong> are strictly retained. This ensures that users banned for exploiting cannot return after a season reset.</li>
-                    <li><strong>Reset Values:</strong> User profiles are not deleted but reset to default values (Credits: 100, Streaks: 0).</li>
+                    <li><strong>User IDs:</strong> Your unique Discord ID is stored to link your inventory, credits, and stats to your account.</li>
+                    <li><strong>Guild IDs:</strong> We store the Server ID and configured Channel ID to send trivia messages to the correct location.</li>
+                    <li><strong>Game Data:</strong> We store your gameplay history, including answer streaks, items owned, and duel records.</li>
                 </ul>
                 
-                <h3>3. Rights</h3>
-                <p>You may request a full account deletion via our Support Server, effectively removing your ID from our database.</p>
+                <h3>2. Data Persistence & Integrity</h3>
+                <p>We prioritize the security and continuity of your digital footprint.</p>
+                <ul>
+                    <li><strong>Storage:</strong> Your data is stored in a secured <strong>MongoDB Atlas</strong> cloud cluster with restricted access.</li>
+                    <li><strong>Economy Wipes:</strong> We do not perform scheduled "Seasonal Resets". Your data is persistent. However, the Developer reserves the right to perform a Global Economy Wipe only in extreme cases (e.g., catastrophic bugs causing hyper-inflation or major version overhauls).</li>
+                </ul>
+                
+                <h3>3. Your Rights</h3>
+                <p>You have full control over your data:</p>
+                <ul>
+                    <li><strong>Request Deletion:</strong> You may request the permanent deletion of all your data (Account Wipe) by opening a support ticket in our official Discord Server.</li>
+                    <li><strong>Processing:</strong> Upon request, your User ID will be removed from our database. This action is irreversible.</li>
+                </ul>
             </div>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2025 TRIVIA PROTOCOL. SYSTEM BY <span style="color:var(--neon-pink)">LLMA</span>.</p>
+        <p>&copy; 2025 All right reserved to LLMA | Trivia Bot</p>
     </footer>
 
     <script>
-        // --- 1. PROCEDURAL AUDIO ENGINE (LOOP PROOF) ---
+        // --- 1. PROCEDURAL AUDIO & ANALYZER ---
         class SynthEngine {
-            constructor() {
-                this.ctx = null;
-                this.masterGain = null;
-                this.oscillators = [];
+            constructor() { 
+                this.ctx = null; 
+                this.gain = null; 
+                this.analyser = null; 
+                this.dataArray = null; 
             }
-            
-            init() {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                this.ctx = new AudioContext();
-                this.masterGain = this.ctx.createGain();
-                this.masterGain.connect(this.ctx.destination);
-                this.masterGain.gain.value = 0;
 
-                // --- LAYER 1: THE WARM PAD (Chords) ---
-                // FMaj7 chord (F, A, C, E) spread out
-                const freqs = [87.31, 110.00, 130.81, 164.81]; 
+            init() {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AC();
                 
-                freqs.forEach((f, i) => {
+                this.analyser = this.ctx.createAnalyser();
+                this.analyser.fftSize = 256; 
+                const bufferLength = this.analyser.frequencyBinCount;
+                this.dataArray = new Uint8Array(bufferLength);
+
+                this.gain = this.ctx.createGain();
+                this.gain.gain.value = 0;
+                
+                this.gain.connect(this.analyser);
+                this.analyser.connect(this.ctx.destination);
+                
+                const freqs = [36.71, 73.42, 110.00, 146.83, 196.00]; 
+                freqs.forEach(f => {
                     const osc = this.ctx.createOscillator();
                     osc.type = "sawtooth";
                     osc.frequency.value = f;
-                    
-                    // Detune for analog warmth
-                    osc.detune.value = (Math.random() - 0.5) * 10; 
-
-                    // Lowpass Filter (The muffled underwater sound)
                     const filter = this.ctx.createBiquadFilter();
                     filter.type = "lowpass";
-                    filter.frequency.value = 300; 
-                    filter.Q.value = 1;
-
-                    // LFO for filter movement (Breathing)
-                    const lfo = this.ctx.createOscillator();
-                    lfo.type = "sine";
-                    lfo.frequency.value = 0.05 + (Math.random() * 0.05); // Very slow
-                    const lfoGain = this.ctx.createGain();
-                    lfoGain.gain.value = 100; // Modulate filter by 100Hz
-                    
-                    lfo.connect(lfoGain);
-                    lfoGain.connect(filter.frequency);
-                    lfo.start();
-
-                    const oscGain = this.ctx.createGain();
-                    oscGain.gain.value = 0.08; // Mix level
-
+                    filter.frequency.value = 300;
                     osc.connect(filter);
-                    filter.connect(oscGain);
-                    oscGain.connect(this.masterGain);
+                    filter.connect(this.gain);
                     osc.start();
-                    this.oscillators.push(osc);
                 });
-
-                // --- LAYER 2: PINK NOISE (The "Waves") ---
-                const bufferSize = 2 * this.ctx.sampleRate;
-                const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const output = noiseBuffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = output[i];
-                    output[i] *= 3.5; 
-                }
-                var lastOut = 0;
-
-                const noise = this.ctx.createBufferSource();
-                noise.buffer = noiseBuffer;
-                noise.loop = true;
-                
-                const noiseFilter = this.ctx.createBiquadFilter();
-                noiseFilter.type = "bandpass";
-                noiseFilter.frequency.value = 600; 
-                
-                // LFO for Waves
-                const waveLfo = this.ctx.createOscillator();
-                waveLfo.type = "sine";
-                waveLfo.frequency.value = 0.15; // Speed of waves
-                const waveGain = this.ctx.createGain();
-                waveGain.gain.value = 0.02; // Volume of waves
-                
-                // VCA (Voltage Controlled Amplifier) approach for volume swelling
-                const volumeLfo = this.ctx.createGain();
-                volumeLfo.gain.value = 0; 
-                waveLfo.connect(volumeLfo.gain);
-                
-                noise.connect(noiseFilter);
-                noiseFilter.connect(volumeLfo);
-                volumeLfo.connect(this.masterGain);
-                
-                noise.start();
-                waveLfo.start();
             }
 
-            fadeIn() { if(this.ctx) this.masterGain.gain.setTargetAtTime(0.5, this.ctx.currentTime, 3); }
-            fadeOut() { if(this.ctx) this.masterGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5); }
+            getAudioData() {
+                if (!this.analyser) return 0;
+                this.analyser.getByteFrequencyData(this.dataArray);
+                let sum = 0;
+                for (let i = 0; i < this.dataArray.length; i++) {
+                    sum += this.dataArray[i];
+                }
+                return sum / this.dataArray.length; 
+            }
+
+            fadeIn() { if(this.ctx) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 4); }
+            fadeOut() { if(this.ctx) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5); }
         }
 
         const audio = new SynthEngine();
@@ -462,7 +614,7 @@
 
         function initializeSystem() {
             document.getElementById('startup-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('startup-overlay').remove(), 1000);
+            setTimeout(() => document.getElementById('startup-overlay').remove(), 800);
             toggleSound();
         }
 
@@ -470,127 +622,118 @@
             const btn = document.getElementById('sound-btn');
             if(!soundOn) {
                 if(!audio.ctx) audio.init();
-                audio.ctx.resume().then(() => {
-                    audio.fadeIn();
-                    soundOn = true;
-                    btn.classList.add('active');
-                });
+                audio.ctx.resume().then(() => { audio.fadeIn(); soundOn = true; btn.classList.add('active'); });
             } else {
-                audio.fadeOut();
-                soundOn = false;
-                btn.classList.remove('active');
+                audio.fadeOut(); soundOn = false; btn.classList.remove('active');
             }
         }
 
-        // --- 2. THREE.JS WAVE SCENE ---
+        // --- 2. THREE.JS RETROWAVE SCENE ---
         const init3D = () => {
             const container = document.getElementById('canvas-container');
             const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050011, 0.002); // Deep purple fog
+            scene.fog = new THREE.FogExp2(0x06000c, 0.002);
 
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
-            camera.position.set(0, 30, 100); 
+            camera.position.set(0, 30, 400); 
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(renderer.domElement);
 
-            // --- A. THE RETRO SUN ---
+            // A. SUN
             const sunCanvas = document.createElement('canvas');
-            sunCanvas.width = 128; sunCanvas.height = 128;
+            sunCanvas.width = 256; sunCanvas.height = 256;
             const ctx = sunCanvas.getContext('2d');
-            const grad = ctx.createLinearGradient(0, 0, 0, 128);
-            grad.addColorStop(0, '#ffd700'); 
-            grad.addColorStop(1, '#ff4800');
+            const grad = ctx.createLinearGradient(0, 0, 0, 256);
+            grad.addColorStop(0, '#ffea00'); 
+            grad.addColorStop(0.5, '#ff0055');
+            grad.addColorStop(1, '#bc13fe');
             ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 128, 128);
-            // Scanlines
-            ctx.fillStyle = '#050011';
-            for(let y=64; y<128; y+=8) ctx.fillRect(0, y, 128, 2 + (y-64)/10);
+            ctx.fillRect(0, 0, 256, 256);
+            
+            ctx.fillStyle = 'rgba(0,0,0,1)';
+            for(let i=128; i<256; i+=8) ctx.fillRect(0, i, 256, 2 + (i-128)/20);
             
             const sunTex = new THREE.CanvasTexture(sunCanvas);
-            const sunMat = new THREE.MeshBasicMaterial({ map: sunTex, transparent: true, fog: false });
-            const sun = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), sunMat);
-            sun.position.set(0, 80, -500);
+            const sun = new THREE.Mesh(new THREE.CircleGeometry(400, 64), new THREE.MeshBasicMaterial({ map: sunTex, transparent: true, fog: false }));
+            sun.position.set(0, 100, -1000);
             scene.add(sun);
 
-            // Reflection on water
-            const refSun = sun.clone();
-            refSun.scale.y = -1;
-            refSun.position.y = -80;
-            refSun.material = sunMat.clone();
-            refSun.material.opacity = 0.2;
-            scene.add(refSun);
+            const sunRef = sun.clone();
+            sunRef.position.y = -120;
+            sunRef.rotation.x = Math.PI;
+            sunRef.scale.y = 0.5;
+            sunRef.material = sun.material.clone();
+            sunRef.material.opacity = 0.15;
+            scene.add(sunRef);
 
-            // --- B. THE LIQUID GRID (WAVES) ---
-            const planeGeo = new THREE.PlaneGeometry(1000, 1000, 60, 60);
-            const planeMat = new THREE.MeshBasicMaterial({ 
-                color: 0x00f3ff, 
-                wireframe: true,
-                transparent: true, 
-                opacity: 0.25
-            });
-            const water = new THREE.Mesh(planeGeo, planeMat);
-            water.rotation.x = -Math.PI / 2;
-            scene.add(water);
+            // B. TERRAIN
+            const planeGeo = new THREE.PlaneGeometry(2000, 2000, 60, 60);
+            const gridMat = new THREE.MeshBasicMaterial({ color: 0xbc13fe, wireframe: true, transparent: true, opacity: 0.3 });
+            const terrain = new THREE.Mesh(planeGeo, gridMat);
+            terrain.rotation.x = -Math.PI / 2;
+            terrain.position.y = -50;
+            scene.add(terrain);
 
-            // Duplicate for infinite scroll
-            const water2 = water.clone();
-            water2.position.z = -1000;
-            scene.add(water2);
+            const terrain2 = terrain.clone();
+            terrain2.position.z = -2000;
+            scene.add(terrain2);
 
-            // --- C. MOUNTAINS (WIREFRAME) ---
-            const mtnGeo = new THREE.ConeGeometry(80, 200, 4, 1, true);
-            const mtnMat = new THREE.MeshBasicMaterial({ color: 0xff0055, wireframe: true, transparent:true, opacity: 0.2 });
-            
-            // Left Mountains
-            for(let i=0; i<5; i++) {
-                const m = new THREE.Mesh(mtnGeo, mtnMat);
-                m.position.set(-200 - (Math.random()*100), 0, -i*200);
-                scene.add(m);
-            }
-            // Right Mountains
-            for(let i=0; i<5; i++) {
-                const m = new THREE.Mesh(mtnGeo, mtnMat);
-                m.position.set(200 + (Math.random()*100), 0, -i*200);
-                scene.add(m);
-            }
-
-            // --- ANIMATION LOOP ---
             const simplex = new SimplexNoise();
             let time = 0;
 
+            // C. ANIMATION LOOP
             const animate = () => {
                 requestAnimationFrame(animate);
                 time += 0.005;
 
-                // 1. Move Grid (Infinite Scroll)
-                water.position.z += 1.5;
-                water2.position.z += 1.5;
-                if(water.position.z > 500) water.position.z = -1500;
-                if(water2.position.z > 500) water2.position.z = -1500;
+                terrain.position.z += 4;
+                terrain2.position.z += 4;
+                if(terrain.position.z > 1000) terrain.position.z = -3000;
+                if(terrain2.position.z > 1000) terrain2.position.z = -3000;
 
-                // 2. Animate Waves (Vertex Displacement)
-                updateWaves(water, time);
-                updateWaves(water2, time);
+                const audioVal = audio.getAudioData(); 
+                const beatMultiplier = audioVal / 5; 
 
-                // 3. Camera subtle float
-                camera.position.y = 30 + Math.sin(time)*2;
+                updateTerrain(terrain, time, beatMultiplier);
+                updateTerrain(terrain2, time, beatMultiplier);
 
                 renderer.render(scene, camera);
             };
 
-            function updateWaves(mesh, t) {
+            function updateTerrain(mesh, t, audioBoost) {
                 const pos = mesh.geometry.attributes.position;
-                for (let i = 0; i < pos.count; i++) {
+                for(let i=0; i<pos.count; i++) {
                     const x = pos.getX(i);
-                    const y = pos.getY(i); // This is Z in world space
-                    // Create wave effect
-                    const z = Math.sin(x * 0.05 + t) * 5 + Math.sin(y * 0.05 + t) * 5;
+                    const y = pos.getY(i);
+                    const dist = Math.abs(x);
+                    
+                    let z = 0;
+                    if(dist > 250) {
+                        z = simplex.noise2D(x * 0.002, y * 0.002) * 150;
+                        if(audioBoost > 10) z += simplex.noise2D(x * 0.01, t) * audioBoost; 
+                        if(z < 0) z = 0;
+                    } else {
+                        z = Math.sin(x * 0.05 + t * 2) * 5 + Math.cos(y * 0.05 + t * 2) * 5;
+                        if(audioBoost > 30) z += (Math.random() - 0.5) * 5; 
+                    }
                     pos.setZ(i, z);
                 }
                 pos.needsUpdate = true;
             }
+
+            // D. STARS
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const starPos = new Float32Array(starCount * 3);
+            for(let i=0; i<starCount*3; i++) {
+                starPos[i] = (Math.random()-0.5) * 3000;
+                if(i%3===1) starPos[i] = Math.abs(starPos[i]) + 200; 
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 2}));
+            scene.add(stars);
 
             animate();
 
